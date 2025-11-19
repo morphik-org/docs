@@ -1,0 +1,255 @@
+---
+title: "Generating Completions with Retrieved Chunks"
+description: "Send Morphik document chunks to OpenAI using presigned URLs or base64-encoded images for vision model completions."
+---
+
+This cookbook demonstrates how to retrieve document chunks from Morphik and send them to OpenAI for completion generation, using both presigned URLs and base64-encoded images.
+
+> **Prerequisites**
+> - Install the Morphik SDK: `pip install morphik`
+> - Install OpenAI SDK: `pip install openai`
+> - Provide credentials via `MORPHIK_URI` and `OPENAI_API_KEY`
+> - Documents ingested with multimodal support (`use_colpali=True`)
+
+## 1. Ingest Documents with Multimodal Support
+
+First, ingest your documents with multimodal retrieval enabled:
+
+```python
+from datetime import date
+from morphik import Morphik
+from openai import OpenAI
+
+# Initialize clients
+morphik_client = Morphik("morphik://your-app:token@api.morphik.ai")
+openai_client = OpenAI(api_key="your-openai-key")
+
+# Ingest PDF with multimodal support
+doc = morphik_client.ingest_file(
+    file="morphik_platform_brief.pdf",
+    metadata={
+        "collection": "demo-ai-briefs",
+        "published_date": date(2024, 9, 14),
+        "priority_score": 42,
+        "requires_followup": True,
+        "tags": ["morphik", "roadmap"],
+    },
+    use_colpali=True,  # Enable multimodal retrieval
+)
+
+# Wait for processing
+doc.wait_for_completion(timeout_seconds=240)
+print(f"Ingested: {doc.external_id}")
+```
+
+## 2. Retrieve Chunks as Presigned URLs
+
+Get chunks as URLs that can be sent directly to vision models:
+
+```python
+# Retrieve chunks as URLs
+url_chunks = morphik_client.retrieve_chunks(
+    query="List notable roadmap items and vision experiments",
+    filters={"collection": "demo-ai-briefs"},
+    k=4,
+    padding=1,
+    use_colpali=True,      # Must match ingestion setting
+    output_format="url",   # Get presigned URLs
+)
+
+# Extract URLs from chunks
+urls = []
+for chunk in url_chunks:
+    if isinstance(chunk.content, str) and chunk.content.startswith("http"):
+        urls.append(chunk.content)
+    elif chunk.download_url:
+        urls.append(chunk.download_url)
+
+print(f"Found {len(urls)} image URLs")
+```
+
+## 3. Send URLs to OpenAI
+
+Send the presigned URLs to OpenAI's vision model:
+
+```python
+QUESTION = "List notable roadmap items, vision experiments, and follow-up actions"
+
+# Build content with text and image URLs
+content = [{"type": "input_text", "text": QUESTION}]
+for url in urls:
+    content.append({"type": "input_image", "image_url": url})
+
+# Call OpenAI Responses API
+response = openai_client.responses.create(
+    model="gpt-5.1",
+    input=[{"role": "user", "content": content}],
+)
+
+print(response.output_text)
+```
+
+## 4. Retrieve Chunks as Base64 Images
+
+For cases where you need base64-encoded images:
+
+```python
+import base64
+from io import BytesIO
+from PIL.Image import Image as PILImage
+
+# Retrieve chunks as PIL Images (default format)
+base64_chunks = morphik_client.retrieve_chunks(
+    query=QUESTION,
+    filters={"collection": "demo-ai-briefs"},
+    k=4,
+    padding=1,
+    use_colpali=True,
+    output_format=None,  # Default: returns PIL Images
+)
+
+# Convert PIL Images to base64 data URIs
+def encode_chunk_image(chunk) -> str:
+    if not isinstance(chunk.content, PILImage):
+        return None
+
+    # Always use image/png for PIL Images
+    buffer = BytesIO()
+    chunk.content.save(buffer, format="PNG")
+    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    return f"data:image/png;base64,{encoded}"
+
+data_uris = [encode_chunk_image(chunk) for chunk in base64_chunks]
+data_uris = [uri for uri in data_uris if uri]  # Filter out None
+
+print(f"Found {len(data_uris)} base64 images")
+```
+
+## 5. Send Base64 Images to OpenAI
+
+```python
+# Build content with text and base64 images
+content = [{"type": "input_text", "text": QUESTION}]
+for data_uri in data_uris:
+    content.append({"type": "input_image", "image_url": data_uri})
+
+# Call OpenAI
+response = openai_client.responses.create(
+    model="gpt-5.1",
+    input=[{"role": "user", "content": content}],
+)
+
+print(response.output_text)
+```
+
+## Important Notes
+
+### Multimodal Ingestion and Retrieval
+
+When you ingest with `use_colpali=True`, you **must** retrieve with `use_colpali=True`:
+
+```python
+# ✅ Correct
+doc = client.ingest_file(file="doc.pdf", use_colpali=True)
+chunks = client.retrieve_chunks(query="...", use_colpali=True)
+
+# ❌ Wrong - Mismatch will return 0 results
+doc = client.ingest_file(file="doc.pdf", use_colpali=True)
+chunks = client.retrieve_chunks(query="...", use_colpali=False)
+```
+
+### Content Type Handling
+
+Chunks from PDFs ingested with multimodal support will have:
+- `chunk.content_type` = `"application/pdf"` (original document type)
+- `chunk.content` = PIL Image object (actual content)
+
+When encoding to base64, always use `"image/png"` as the MIME type:
+
+```python
+# ✅ Correct: Use image/png for PIL Images
+data_uri = f"data:image/png;base64,{encoded}"
+
+# ❌ Wrong: Don't use chunk.content_type (would be "application/pdf")
+data_uri = f"data:{chunk.content_type};base64,{encoded}"
+```
+
+### Output Format Comparison
+
+| Format | When to Use | Pros | Cons |
+|--------|-------------|------|------|
+| `output_format="url"` | Production, large images | No encoding overhead, faster | URLs expire after some time |
+| `output_format=None` (base64) | Small images, offline processing | Always available | Larger payload size |
+
+## Use Cases
+
+This pattern is ideal for:
+
+- **Document Q&A** over visual documents (PDFs, scans, diagrams)
+- **Report generation** from technical documentation with charts and tables
+- **Visual data analysis** combining text and image understanding
+- **Multi-document synthesis** aggregating information across documents
+- **Chart and diagram interpretation** using vision-capable models
+- **Technical specification review** analyzing mixed text-visual content
+
+## Best Practices
+
+### 1. Choose the Right Output Format
+
+Use URLs for production workloads with large images:
+```python
+# Production: Use URLs
+chunks = client.retrieve_chunks(..., output_format="url")
+```
+
+Use base64 for small images or offline processing:
+```python
+# Small images or offline: Use base64
+chunks = client.retrieve_chunks(..., output_format=None)
+```
+
+### 2. Handle Chunk Padding
+
+Use `padding` to include adjacent chunks/pages for better context:
+```python
+chunks = client.retrieve_chunks(
+    query="...",
+    k=4,
+    padding=1,  # Include 1 adjacent chunk on each side
+    use_colpali=True,
+)
+```
+
+### 3. Filter with Metadata
+
+Combine retrieval with metadata filtering for precise results:
+```python
+chunks = client.retrieve_chunks(
+    query="roadmap items",
+    filters={
+        "$and": [
+            {"collection": {"$eq": "technical-docs"}},
+            {"published_date": {"$gte": "2024-01-01"}},
+            {"priority_score": {"$gte": 40}},
+        ]
+    },
+    k=4,
+    use_colpali=True,
+)
+```
+
+## Running the Example
+
+```bash
+# Set environment variables
+export MORPHIK_URI="morphik://your-app:your-token@api.morphik.ai"
+export OPENAI_API_KEY="sk-..."
+
+# Run your Python script with the code above
+python your_script.py
+```
+
+## Related Cookbooks
+
+- [Complex Metadata Filtering](./complex-metadata-filtering) - Advanced document filtering with dates, arrays, and more
+- [Python SDK Basic Operations](./python-basic-operations) - Core Morphik operations

@@ -1,0 +1,225 @@
+---
+title: "Complex Metadata Filtering"
+description: "Advanced document filtering using dates, arrays, decimals, and multiple operators for precise retrieval."
+---
+
+This cookbook demonstrates Morphik's advanced metadata filtering capabilities with rich typed metadata fields including dates, decimals, booleans, arrays, and nested objects.
+
+> **Prerequisites**
+> - Install the Morphik SDK: `pip install morphik`
+> - Provide credentials via Morphik URI
+> - Basic understanding of document ingestion
+
+## 1. Ingest Documents with Rich Typed Metadata
+
+Morphik supports various metadata types for sophisticated filtering:
+
+```python
+from datetime import date, datetime, timezone
+from decimal import Decimal
+from morphik import Morphik
+
+client = Morphik("morphik://your-app:token@api.morphik.ai")
+
+# Rich metadata with multiple types
+metadata = {
+    # Strings
+    "region": "andes",
+    "project_code": "hydro-life-2024",
+
+    # Dates and datetimes
+    "fieldwork_date": date(2024, 9, 18),
+    "monitoring_window_start": datetime(2024, 9, 18, 9, 10, tzinfo=timezone.utc),
+    "monitoring_window_end": datetime(2024, 9, 18, 17, 35, tzinfo=timezone.utc),
+
+    # Numbers
+    "hazard_score": 41,                    # Integer
+    "ph_reading": Decimal("6.3"),          # Decimal (precise)
+    "water_depth_cm": 12.4,                # Float
+    "samples_collected": 18,
+
+    # Boolean
+    "is_priority_site": True,
+
+    # Arrays
+    "tags": ["wildlife", "flood-risk", "community"],
+
+    # Nested objects
+    "sensor_loadout": {
+        "drone": "Skydio X10",
+        "camera": "multispectral",
+        "thermal_gain": 0.43,
+    },
+}
+
+# Ingest document with metadata
+doc = client.ingest_text(
+    content="Laguna Amazonas boardwalk inspection for wetlands buffers...",
+    filename="laguna-amazonas-field-brief.md",
+    metadata=metadata,
+    use_colpali=True,
+)
+
+# Wait for completion
+doc.wait_for_completion(timeout_seconds=150)
+print(f"Ingested: {doc.external_id}")
+```
+
+## 2. Build Complex Filters
+
+Combine multiple operators to create sophisticated queries:
+
+```python
+from datetime import date
+
+# Complex filter with multiple conditions
+filters = {
+    "$and": [
+        # Exact match
+        {"project_code": {"$eq": "hydro-life-2024"}},
+
+        # Array membership
+        {"region": {"$in": ["andes"]}},
+
+        # Date range (>= September 15, 2024)
+        {"fieldwork_date": {"$gte": date(2024, 9, 15).isoformat()}},
+
+        # Number range (<= 45)
+        {"hazard_score": {"$lte": 45}},
+
+        # Boolean match
+        {"is_priority_site": True},
+
+        # Array contains value
+        {"tags": {"$contains": {"value": "wildlife"}}},
+
+        # Decimal comparison
+        {"ph_reading": {"$lte": "6.5"}},
+    ]
+}
+```
+
+## 3. List Documents with Filters
+
+Find documents matching your criteria:
+
+```python
+# Query documents with filters
+response = client.list_documents(
+    filters=filters,
+    include_total_count=True,
+    completed_only=True
+)
+
+print(f"\nFound {response.total_count} matching documents:")
+for doc in response.documents:
+    print(f"- {doc.filename}")
+    print(f"  Hazard Score: {doc.metadata.get('hazard_score')}")
+    print(f"  Tags: {doc.metadata.get('tags')}")
+```
+
+## 4. Retrieve Chunks with Filters
+
+Get document chunks that match your metadata filters:
+
+```python
+# Retrieve filtered chunks
+chunks = client.retrieve_chunks(
+    query="Summarize wildlife or flood risks that impact the wetlands buffer program",
+    filters=filters,
+    k=4,
+    padding=1,
+    use_colpali=True,
+)
+
+print(f"\nRetrieved {len(chunks)} filtered chunks:")
+for chunk in chunks:
+    print(f"\nChunk {chunk.chunk_number} from {chunk.filename} (score={chunk.score:.3f})")
+    print(f"Content preview: {chunk.content[:200]}...")
+    print(f"Metadata: {chunk.metadata}")
+```
+
+## Supported Filter Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `$eq` | Exact match | `{"status": {"$eq": "active"}}` |
+| `$in` | Value in array | `{"region": {"$in": ["andes", "altiplano"]}}` |
+| `$gte` | Greater than or equal | `{"date": {"$gte": "2024-01-01"}}` |
+| `$lte` | Less than or equal | `{"score": {"$lte": 45}}` |
+| `$gt` | Greater than | `{"temperature": {"$gt": 0}}` |
+| `$lt` | Less than | `{"count": {"$lt": 100}}` |
+| `$contains` | Array contains value | `{"tags": {"$contains": {"value": "urgent"}}}` |
+| `$and` | All conditions must match | `{"$and": [condition1, condition2]}` |
+| `$or` | Any condition must match | `{"$or": [condition1, condition2]}` |
+
+## Use Cases
+
+Complex metadata filtering is ideal for:
+
+- **Document management systems** with multi-dimensional categorization
+- **Compliance and audit systems** requiring date-based queries
+- **Scientific data repositories** with measurements and precise numerical filtering
+- **Multi-tenant applications** with scope-based isolation
+- **Time-series document collections** with date range queries
+- **Hierarchical data** with nested metadata structures
+
+## Best Practices
+
+### 1. Use Appropriate Types
+
+Use the correct Python types for metadata:
+
+```python
+# ✅ Correct
+metadata = {
+    "date": date(2024, 9, 15),        # Use date objects
+    "price": Decimal("19.99"),        # Use Decimal for precision
+    "is_active": True,                # Use bool for flags
+}
+
+# ❌ Avoid
+metadata = {
+    "date": "2024-09-15",            # String instead of date
+    "price": 19.99,                  # Float loses precision
+    "is_active": "true",             # String instead of bool
+}
+```
+
+### 2. Convert Dates for Filtering
+
+Always convert date objects to ISO format when building filters:
+
+```python
+# ✅ Correct
+{"fieldwork_date": {"$gte": date(2024, 9, 15).isoformat()}}
+
+# ❌ Wrong
+{"fieldwork_date": {"$gte": date(2024, 9, 15)}}  # Date object won't work
+```
+
+### 3. Combine Operators Strategically
+
+- Use `$and` for required conditions that must all match
+- Use `$in` when a field can have multiple possible values
+- Use range operators (`$gte`, `$lte`) for numerical and date filtering
+- Use `$contains` for array membership checks
+
+### 4. Index Important Fields
+
+Frequently filtered fields benefit from proper indexing. Consider performance when adding many metadata fields.
+
+## Running the Example
+
+```bash
+# Set your Morphik URI
+export MORPHIK_URI="morphik://your-app:your-token@api.morphik.ai"
+
+# Run your Python script with the code above
+python your_script.py
+```
+
+## Related Cookbooks
+
+- [Generating Completions with Retrieved Chunks](./generating-completions-with-retrieved-chunks) - Send filtered chunks to OpenAI
+- [Python SDK Basic Operations](./python-basic-operations) - Core Morphik operations
