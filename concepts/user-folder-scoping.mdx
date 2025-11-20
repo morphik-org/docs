@@ -103,6 +103,49 @@ async with AsyncMorphik() as db:
 - Scopes can be used for both reading and writing operations
 - User and folder information is stored as metadata with the documents, so you can still filter across scopes with explicit filter parameters if needed
 
+## Filtering by Folder Name in Metadata
+
+When you ingest documents in a folder with the `folder_name` parameter, that value is automatically available in the document's metadata for filtering. This enables powerful cross-folder queries using Morphik's metadata filter operators:
+
+```python
+from morphik import Morphik
+
+db = Morphik()
+
+# Filter documents from multiple folders
+filters = {
+    "folder_name": {"$in": ["legal", "hr", "finance"]}
+}
+docs = db.list_documents(filters=filters)
+
+# Combine folder filtering with other metadata
+filters = {
+    "$and": [
+        {"folder_name": {"$regex": {"pattern": "^project_", "flags": "i"}}},
+        {"status": "active"},
+        {"priority": {"$gte": 70}}
+    ]
+}
+response = db.query("What are the high-priority project updates?", filters=filters)
+
+# Exclude specific folders
+filters = {
+    "$and": [
+        {"folder_name": {"$nin": ["archived", "drafts"]}},
+        {"created_date": {"$gte": "2024-01-01"}}
+    ]
+}
+chunks = db.retrieve_chunks("quarterly report", filters=filters, k=10)
+```
+
+This approach is useful when you need to:
+- Query across multiple folders simultaneously
+- Use pattern matching on folder names
+- Combine folder filters with complex metadata conditions
+- Build dynamic queries where folder selection isn't known at scope creation time
+
+For more filtering examples, see the [Complex Metadata Filtering](/cookbooks/complex-metadata-filtering) cookbook and [Metadata Filtering](/concepts/metadata-filtering) reference.
+
 ## Use Cases
 
 ### Multi-Project Research Team

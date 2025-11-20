@@ -99,6 +99,40 @@ filters = {
 }
 ```
 
+### Filtering by Folder Name
+
+Documents ingested with a `folder_name` parameter can be filtered using that value in metadata. This enables cross-folder queries and pattern matching:
+
+```python
+# Filter specific folder
+filters = {"folder_name": "reports"}
+
+# Query multiple folders
+filters = {
+    "folder_name": {"$in": ["reports", "invoices", "contracts"]}
+}
+
+# Exclude archived folders
+filters = {
+    "folder_name": {"$nin": ["archived", "drafts", "test"]}
+}
+
+# Pattern matching on folder names
+filters = {
+    "folder_name": {"$regex": {"pattern": "^project_", "flags": "i"}}
+}
+
+# Combine folder with other metadata
+filters = {
+    "$and": [
+        {"folder_name": {"$in": ["legal", "compliance"]}},
+        {"priority": {"$gte": 70}},
+        {"status": "active"},
+        {"year": 2024}
+    ]
+}
+```
+
 ## 3. List Documents with Filters
 
 Find documents matching your criteria:
