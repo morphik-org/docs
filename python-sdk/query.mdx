@@ -85,6 +85,23 @@ response = db.query(
 )
 ```
 
+You can also filter by folder name and use expressive operators like `$in`, `$regex`, and `$nin`:
+
+```python
+# Query across multiple folders
+filters = {
+    "$and": [
+        {"folder_name": {"$in": ["reports", "invoices"]}},
+        {"year": 2024},
+        {"priority": {"$gte": 50}}
+    ]
+}
+
+response = db.query("What are the key financial highlights?", filters=filters)
+```
+
+For more advanced filtering patterns, see the [Complex Metadata Filtering cookbook](/cookbooks/complex-metadata-filtering).
+
 ## Returns
 
 - `CompletionResponse`: Response containing the completion, source information, and potentially structured output.
