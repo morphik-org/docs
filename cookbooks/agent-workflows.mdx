@@ -2,312 +2,280 @@
 title: "Agent Workflows"
 description: "Practical examples of using the Morphik Agent for complex analysis tasks"
 ---
-The Morphik Agent enables sophisticated workflows that go far beyond simple document retrieval. This cookbook provides practical examples of how to use the agent for complex analysis tasks.
+This page focuses on a single pattern: wiring Morphik retrieval tools into your own agent loop.
 
-## Financial Analysis Workflow
+## Build a Retrieval Agent with Morphik Tools
 
-This example shows how the agent can autonomously analyze financial documents, perform calculations, and generate insights.
+Use Morphik's retrieval APIs as function-calling tools when you want a lightweight agent loop you fully control. The example below uses OpenAI's Responses API, `list_documents` for discovery, and `retrieve_chunks` (with ColPali image URLs) for grounded answers.
+
+> Prerequisites: `pip install morphik openai`, set `MORPHIK_URI` and `OPENAI_API_KEY`, and update the metadata fields in `SYSTEM_INSTRUCTIONS` to match your corpus.
+
+Giving the LLM direct access to retrieval tools lets it decide when to explore vs. fetch, narrow scope with filters, and request only the needed pages. This example exposes two tools, but you can add more (e.g., page-range or download helpers) from the [API reference](/api-reference/getting-started) to expand the agent’s toolkit while keeping guardrails tight. You can use any major LLM with tool-calling support (OpenAI, Anthropic, Gemini, etc.); we show OpenAI for familiarity and will add provider-specific snippets soon—the core loop remains the same.
+
+Imports used in the snippets below:
 
 ```python
+import argparse
+import json
+import os
 from morphik import Morphik
-
-db = Morphik()
-
-# Complex financial analysis query
-result = db.agent_query("""
-Analyze our quarterly financial reports for the last two years.
-Calculate key metrics like revenue growth rate, profit margins, and ROI.
-Identify trends and provide actionable recommendations for improving profitability.
-Save the key insights for future reference.
-""")
-
-print("Financial Analysis:")
-print(result["response"])
-
-# Check what the agent did
-print("\nAgent Tool Usage:")
-for i, tool in enumerate(result["tool_history"], 1):
-    print(f"{i}. {tool['tool_name']}")
-    if tool['tool_name'] == 'execute_code':
-        print(f"   Executed: {tool['tool_args']['code'][:100]}...")
-
-# Display structured results
-for obj in result["display_objects"]:
-    if obj["type"] == "text" and "## Key Metrics" in obj["content"]:
-        print("\nKey Financial Metrics:")
-        print(obj["content"])
+from openai import OpenAI
 ```
 
-## Customer Research Pipeline
+### 1) System prompt
 
-Demonstrates how the agent can research customer data, analyze sentiment, and identify opportunities.
-
-```python
-# Multi-step customer analysis
-customer_analysis = db.agent_query("""
-Research our customer feedback and support tickets from the last quarter.
-Analyze sentiment trends and identify the top 3 pain points.
-For each pain point, suggest specific product improvements.
-Create a priority matrix based on impact and effort.
-""")
-
-print("Customer Research Results:")
-print(customer_analysis["response"])
-
-# Extract any charts or visualizations the agent created
-for obj in customer_analysis["display_objects"]:
-    if obj["type"] == "image":
-        print(f"Generated visualization: {obj['caption']}")
-        # In a real app, you'd display the image from obj["content"]
-```
-
-## Knowledge Graph Discovery
-
-Shows how to use the agent to explore complex relationships in your data.
+Use this to govern the agent’s behavior, metadata awareness, and citation discipline; it is the primary control surface for how the loop plans and answers.
 
 ```python
-# Knowledge graph exploration
-kg_insights = db.agent_query("""
-Explore our product knowledge graph to find unexpected connections 
-between customer segments and product features.
-Identify potential cross-selling opportunities based on relationship strengths.
-Create a ranked list of opportunities with supporting evidence.
-""")
+SYSTEM_INSTRUCTIONS = """You are a helpful assistant with access to a curated knowledge base.
 
-print("Knowledge Graph Insights:")
-print(kg_insights["response"])
+Available metadata fields (customize to your schema):
+- doc_id (string)
+- doc_type (string)
+- title (string)
+- category (string)
+- status (string)
+- effective_date (datetime)
+- expires_at (datetime)
+- tags (array)
+- region (string)
 
-# Check if the agent found any graph relationships
-for tool in kg_insights["tool_history"]:
-    if tool["tool_name"] == "knowledge_graph_query":
-        print(f"Graph query: {tool['tool_args']}")
-        print(f"Results: {str(tool['tool_result'])[:200]}...")
-```
+Filter operators:
+- $eq, $gt, $gte, $lt, $lte, $and, $contains, $regex
 
-## Document Intelligence Workflow
-
-Demonstrates automated document analysis and summarization.
-
-```python
-# Intelligent document processing
-doc_intelligence = db.agent_query("""
-Analyze all documents in our legal department folder.
-Extract key contract terms, identify renewal dates, and flag any risks.
-Create a summary report with actionable items for the legal team.
-""")
-
-print("Document Intelligence Report:")
-print(doc_intelligence["response"])
-
-# Show how the agent processed different document types
-documents_analyzed = [
-    tool for tool in doc_intelligence["tool_history"] 
-    if tool["tool_name"] == "document_analyzer"
-]
-
-print(f"\nAnalyzed {len(documents_analyzed)} documents:")
-for tool in documents_analyzed:
-    doc_id = tool["tool_args"].get("document_id", "unknown")
-    analysis_type = tool["tool_args"].get("analysis_type", "general")
-    print(f"- Document {doc_id}: {analysis_type} analysis")
-```
-
-## Competitive Analysis
-
-Shows how the agent can combine multiple data sources for strategic insights.
-
-```python
-# Strategic competitive analysis
-competitive_analysis = db.agent_query("""
-Analyze our product documentation and market research reports.
-Compare our features against competitor data in the knowledge graph.
-Identify gaps in our offering and opportunities for differentiation.
-Calculate market share implications and recommend strategic priorities.
-""")
-
-print("Competitive Analysis:")
-print(competitive_analysis["response"])
-
-# Extract strategic recommendations
-for obj in competitive_analysis["display_objects"]:
-    if "recommendation" in obj["content"].lower():
-        print("\nStrategic Recommendations:")
-        print(obj["content"])
-```
-
-## Iterative Analysis with Memory
-
-Demonstrates how the agent's memory enables progressive analysis.
-
-```python
-# Step 1: Initial analysis with memory
-step1 = db.agent_query("""
-Analyze our marketing campaign performance across all channels.
-Calculate ROI for each channel and identify top performers.
-Save the key findings and metrics for future analysis.
-""")
-
-# Step 2: Build on previous analysis
-step2 = db.agent_query("""
-Based on our previous marketing performance analysis,
-develop an optimized budget allocation strategy for next quarter.
-Compare projected ROI with current performance.
-""")
-
-# Step 3: Create action plan
-step3 = db.agent_query("""
-Using our marketing analysis and budget optimization,
-create a detailed implementation plan with timelines and success metrics.
-""")
-
-print("Progressive Analysis Results:")
-print("Step 1 - Performance Analysis:")
-print(step1["response"][:200] + "...\n")
-
-print("Step 2 - Budget Optimization:")
-print(step2["response"][:200] + "...\n")
-
-print("Step 3 - Implementation Plan:")
-print(step3["response"])
-```
-
-## Data Validation and Quality Checks
-
-Shows how the agent can validate data consistency across documents.
-
-```python
-# Data validation workflow
-validation_results = db.agent_query("""
-Check consistency of financial data across our quarterly reports.
-Identify any discrepancies in revenue, costs, or key metrics.
-Calculate data quality scores and flag potential errors.
-Provide recommendations for improving data accuracy.
-""")
-
-print("Data Validation Results:")
-print(validation_results["response"])
-
-# Check for any code the agent wrote to validate data
-code_executions = [
-    tool for tool in validation_results["tool_history"]
-    if tool["tool_name"] == "execute_code"
-]
-
-print(f"\nAgent performed {len(code_executions)} validation calculations")
-for execution in code_executions:
-    if "discrepancy" in str(execution["tool_result"]).lower():
-        print("Found data discrepancy:", execution["tool_result"])
-```
-
-## Best Practices for Agent Workflows
-
-### 1. Be Specific About Deliverables
-
-```python
-# Good: Clear expected outcomes
-query = """
-Analyze customer churn data and:
-1. Calculate monthly churn rate trends
-2. Identify top 3 churn drivers
-3. Estimate revenue impact
-4. Recommend retention strategies
+Strategy:
+1) Call list_documents to see available material and metadata.
+2) Apply filters before retrieval when date, status, region, or tags matter.
+3) Use retrieve_chunks with use_colpali=True and output_format="url" to pull text and images.
+4) Cite sources with doc_id (or your ID field), filename, and page numbers.
 """
-
-# Less optimal: Vague request
-query = "Look at customer churn"
 ```
 
-### 2. Use Memory for Complex Projects
+### 2) Tool schemas (OpenAI Responses API)
+
+Expose only the tools you want the model to call. The schema format may differ slightly by provider, but the tool list and arguments stay consistent.
 
 ```python
-# Break complex projects into phases
-phases = [
-    "Analyze current market position and save findings",
-    "Based on market analysis, identify expansion opportunities",
-    "Create detailed business plan for top opportunity",
-    "Calculate financial projections and risk assessment"
-]
-
-results = []
-for phase in phases:
-    result = db.agent_query(phase)
-    results.append(result)
-    print(f"Completed: {phase}")
-```
-
-### 3. Validate Agent Outputs
-
-```python
-def validate_agent_response(result):
-    """Validate and extract key information from agent response"""
-    
-    # Check for errors
-    if "error" in result["response"].lower():
-        return {"valid": False, "error": "Agent reported error"}
-    
-    # Check if calculations were performed
-    calculations = [
-        tool for tool in result["tool_history"]
-        if tool["tool_name"] == "execute_code"
-    ]
-    
-    # Extract key metrics
-    metrics = {}
-    for obj in result["display_objects"]:
-        if obj["type"] == "text" and "%" in obj["content"]:
-            # Extract percentage values
-            import re
-            percentages = re.findall(r'(\d+\.?\d*)%', obj["content"])
-            metrics["percentages"] = percentages
-    
-    return {
-        "valid": True,
-        "calculations_performed": len(calculations),
-        "metrics": metrics,
-        "sources_count": len(result["sources"])
+TOOLS = [
+    {
+        "type": "function",
+        "name": "list_documents",
+        "description": "List documents in the knowledge base with optional metadata filters.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "filters": {
+                    "type": ["string", "null"],
+                    "description": "Metadata filters as a JSON string. Pass null or empty for no filters."
+                },
+                "limit": {
+                    "type": ["integer", "null"],
+                    "description": "Maximum number of documents to return (default: 10)"
+                }
+            },
+            "required": ["filters", "limit"],
+            "additionalProperties": False
+        },
+        "strict": True
+    },
+    {
+        "type": "function",
+        "name": "retrieve_chunks",
+        "description": "Retrieve relevant document chunks for a query using semantic search.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Search query or user question"
+                },
+                "filters": {
+                    "type": ["string", "null"],
+                    "description": "Optional metadata filters as a JSON string"
+                },
+                "k": {
+                    "type": ["integer", "null"],
+                    "description": "Number of chunks to retrieve (default: 3)"
+                }
+            },
+            "required": ["query", "filters", "k"],
+            "additionalProperties": False
+        },
+        "strict": True
     }
-
-# Use validation
-result = db.agent_query("Calculate our quarterly growth rate")
-validation = validate_agent_response(result)
-print(f"Validation: {validation}")
+]
 ```
 
-## Error Handling and Recovery
+### 3) Tool implementations (Morphik Python SDK)
+
+These Python functions bridge the LLM’s tool calls to Morphik APIs and normalize outputs (metadata, previews, image URLs) for reuse in the loop.
 
 ```python
-def robust_agent_query(query, max_retries=2):
-    """Agent query with error handling and retries"""
-    
-    for attempt in range(max_retries + 1):
-        try:
-            result = db.agent_query(query)
-            
-            # Check for tool failures
-            failed_tools = [
-                tool for tool in result.get("tool_history", [])
-                if "error" in str(tool.get("tool_result", "")).lower()
-            ]
-            
-            if failed_tools and attempt < max_retries:
-                print(f"Attempt {attempt + 1} had tool failures, retrying...")
-                continue
-                
-            return result
-            
-        except Exception as e:
-            if attempt < max_retries:
-                print(f"Attempt {attempt + 1} failed: {e}, retrying...")
-                continue
-            else:
-                raise e
-    
-    return None
+def list_documents(morphik: Morphik, filters=None, limit=None):
+    if isinstance(filters, str) and filters.strip():
+        filters = json.loads(filters)
 
-# Use robust querying
-result = robust_agent_query(
-    "Perform complex financial analysis with error checking"
-)
+    response = morphik.list_documents(filters=filters, limit=limit or 10)
+    docs = response.documents if hasattr(response, "documents") else response
+
+    normalized = []
+    for doc in docs:
+        meta = doc.metadata or {}
+        normalized.append({
+            "external_id": doc.external_id,
+            "filename": doc.filename,
+            "doc_id": meta.get("doc_id"),
+            "title": meta.get("title"),
+            "doc_type": meta.get("doc_type"),
+            "category": meta.get("category"),
+            "status": meta.get("status"),
+            "effective_date": str(meta.get("effective_date")) if meta.get("effective_date") else None,
+            "expires_at": str(meta.get("expires_at")) if meta.get("expires_at") else None,
+            "tags": meta.get("tags") or [],
+        })
+
+    return {"documents": normalized, "count": len(normalized)}
+
+
+def retrieve_chunks(morphik: Morphik, query, filters=None, k=None):
+    if isinstance(filters, str) and filters.strip():
+        filters = json.loads(filters)
+
+    chunks = morphik.retrieve_chunks(
+        query=query,
+        filters=filters,
+        k=k or 3,
+        use_colpali=True,
+        output_format="url"
+    )
+
+    results = []
+    image_urls = []
+
+    for chunk in chunks:
+        meta = chunk.metadata or {}
+        is_image_url = isinstance(chunk.content, str) and chunk.content.startswith("http")
+
+        if is_image_url:
+            image_urls.append(chunk.content)
+
+        preview = chunk.content
+        if isinstance(preview, str) and len(preview) > 300:
+            preview = f"{preview[:300]}..."
+        if is_image_url:
+            preview = f"[Image URL: {chunk.content}]"
+
+        results.append({
+            "score": round(chunk.score, 3),
+            "content_preview": preview,
+            "filename": meta.get("filename") or chunk.filename or "unknown",
+            "doc_id": meta.get("doc_id"),
+            "doc_type": meta.get("doc_type"),
+            "title": meta.get("title"),
+            "expires_at": str(meta.get("expires_at")) if meta.get("expires_at") else None,
+            "tags": meta.get("tags") or [],
+        })
+
+    return {
+        "chunks": results,
+        "count": len(results),
+        "image_urls": image_urls
+    }
 ```
 
-These workflows demonstrate the power of the Morphik Agent for complex, multi-step analysis tasks that would be impossible with traditional retrieval-based systems. The agent's ability to plan, execute tools, and remember context makes it ideal for sophisticated business intelligence and research workflows. 
+### 4) Agent runner (OpenAI Responses loop)
+
+Handles the model call, executes tool invocations, and re-feeds results until the model returns a final answer. Swap the client/model for any tool-calling LLM and keep the structure.
+
+```python
+def run_agent(morphik: Morphik, openai_client: OpenAI, user_query: str, model: str):
+    conversation = [{"role": "user", "content": user_query}]
+
+    for _ in range(5):
+        response = openai_client.responses.create(
+            model=model,
+            instructions=SYSTEM_INSTRUCTIONS,
+            tools=TOOLS,
+            input=conversation
+        )
+
+        conversation += response.output
+        calls = [item for item in response.output if item.type == "function_call"]
+
+        if not calls:
+            print(response.output_text)
+            return
+
+        for call in calls:
+            args = json.loads(call.arguments)
+
+            if call.name == "list_documents":
+                result = list_documents(
+                    morphik,
+                    filters=args.get("filters"),
+                    limit=args.get("limit")
+                )
+                image_urls = []
+            elif call.name == "retrieve_chunks":
+                result = retrieve_chunks(
+                    morphik,
+                    query=args["query"],
+                    filters=args.get("filters"),
+                    k=args.get("k")
+                )
+                image_urls = result.get("image_urls", [])
+            else:
+                result = {"error": f"Unknown function: {call.name}"}
+                image_urls = []
+
+            conversation.append({
+                "type": "function_call_output",
+                "call_id": call.call_id,
+                "output": json.dumps(result)
+            })
+
+            if image_urls:
+                image_content = [{"type": "input_text", "text": "Here are the retrieved pages:"}]
+                for url in image_urls:
+                    image_content.append({"type": "input_image", "image_url": url})
+                conversation.append({"role": "user", "content": image_content})
+
+    print("[Warning] Reached maximum iterations without a final answer")
+```
+
+### 5) Optional CLI entry point
+
+```python
+def main():
+    parser = argparse.ArgumentParser(description="Retrieval agent with Morphik tools")
+    parser.add_argument("--uri", default=os.getenv("MORPHIK_URI"))
+    parser.add_argument("--query", default="What are the latest policy updates published this year?")
+    parser.add_argument("--openai-key", default=os.getenv("OPENAI_API_KEY"))
+    parser.add_argument("--model", default="gpt-4o-mini")
+    args = parser.parse_args()
+
+    if not args.uri:
+        raise SystemExit("MORPHIK_URI not set. Use --uri or set MORPHIK_URI.")
+    if not args.openai_key:
+        raise SystemExit("OPENAI_API_KEY not set. Use --openai-key or set OPENAI_API_KEY.")
+
+    morphik = Morphik(args.uri, timeout=30)
+    openai_client = OpenAI(api_key=args.openai_key)
+    run_agent(morphik, openai_client, args.query, args.model)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+Run it with your own question:
+
+```bash
+export MORPHIK_URI="morphik://your-token@your-host"
+export OPENAI_API_KEY="your-openai-key"
+python retrieval_agent.py --query "Where can I find the most recent safety policies?"
+```
+
+To extend this loop, add more Morphik tools (e.g., page-range retrieval or download helpers) from the [API reference](/api-reference/getting-started) into `TOOLS` and implement matching handlers in the runner.
+
+This retrieval agent pattern shows how to keep full control over tool usage while grounding responses with Morphik. The agent's ability to plan, execute tools, and remember context makes it ideal for sophisticated business intelligence and research workflows.
