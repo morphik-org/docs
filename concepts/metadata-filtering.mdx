@@ -3,7 +3,7 @@ title: "Metadata Filtering"
 description: "Canonical reference for Morphik’s metadata filter DSL and typed comparisons."
 ---
 
-Morphik lets you filter documents and chunks directly in the database using a concise JSON filter syntax. The same structure powers the REST API, Python SDK (sync + async), folder helpers, `UserScope`, caches, and knowledge-graph builders, so you can define a filter once and reuse it everywhere.
+Morphik lets you filter documents and chunks directly in the database using a concise JSON filter syntax. The same structure powers the REST API, Python SDK (sync + async), folder helpers, `UserScope`, and knowledge-graph builders, so you can define a filter once and reuse it everywhere.
 
 <Note>
   Prefer server-side filters over client-side post-processing. You’ll reduce bandwidth, improve performance, and keep behavior consistent between endpoints.
@@ -14,7 +14,7 @@ Morphik lets you filter documents and chunks directly in the database using a co
 You can pass `filters` (or `document_filters`) to:
 
 - Retrieval endpoints: [`retrieve_chunks`](/python-sdk/retrieve_chunks), [`retrieve_docs`](/python-sdk/retrieve_docs), [`query`](/python-sdk/query), [`query_document`](/python-sdk/query_document) ingestion options.
-- Listing/management: [`list_documents`](/python-sdk/list_documents), document/folder analytics, graph create/update, caches, chat history, and anywhere an SDK method exposes a `filters` argument.
+- Listing/management: [`list_documents`](/python-sdk/list_documents), document/folder analytics, graph create/update, chat history, and anywhere an SDK method exposes a `filters` argument.
 
 ## Quick Start
 

@@ -117,7 +117,6 @@
               "blogs/memory-vibe-coding",
               "blogs/llm-science-battle",
               "blogs/gpt-vs-morphik-multimodal",
-              "blogs/cache-augmented-generation",
               "blogs/stop-parsing-docs"
             ]
           }
@@ -211,13 +210,6 @@
               "python-sdk/list_graphs",
               "python-sdk/get_graph_visualization",
               "python-sdk/check_workflow_status"
-            ]
-          },
-          {
-            "group": "Cache Management",
-            "pages": [
-              "python-sdk/create_cache",
-              "python-sdk/get_cache"
             ]
           },
           {

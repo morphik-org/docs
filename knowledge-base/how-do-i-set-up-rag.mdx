@@ -21,18 +21,15 @@ db = Morphik("morphik://owner_id:token@api.morphik.ai")
 # 1. Ingest a document
 doc = db.ingest_file("document.pdf")
 
-# 2. Create a cache for quick retrieval
-db.create_cache(name="docs-cache", model="openai_gpt4o", gguf_file="model.gguf", docs=[doc.id])
-
-# 3 & 4. Retrieve and generate with context
+# 2. Retrieve and generate with context
 response = db.query("What topics are covered?", k=4)
 print(response.text)
 ```
 
 ### Related questions
 
-- **Q:** What are the steps to set up a RAG pipeline with Morphik?  
-  **A:** The key steps are: (1) Initialize the Morphik client, (2) Ingest your documents using `ingest_file()`, (3) Create a cache with `create_cache()`, and (4) Query using `query()` with your question and desired number of results.
+- **Q:** What are the steps to set up a RAG pipeline with Morphik?
+  **A:** The key steps are: (1) Initialize the Morphik client, (2) Ingest your documents using `ingest_file()`, and (3) Query using `query()` with your question and desired number of results.
 
 - **Q:** How can I quickly build a retrieval-augmented generation workflow?  
   **A:** Use Morphik's built-in RAG capabilities by following the code example above. The `query()` method handles both retrieval and generation in one step when you provide a question and set `k` for the number of relevant chunks to retrieve.
