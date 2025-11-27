@@ -18,12 +18,16 @@ Generate completion using relevant chunks as context.
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
         use_colpali: bool = True,
+        use_reranking: Optional[bool] = None,
         graph_name: Optional[str] = None,
         hop_depth: int = 1,
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        chat_id: Optional[str] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
         llm_config: Optional[Dict[str, Any]] = None,
+        padding: int = 0,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -37,12 +41,16 @@ Generate completion using relevant chunks as context.
         max_tokens: Optional[int] = None,
         temperature: Optional[float] = None,
         use_colpali: bool = True,
+        use_reranking: Optional[bool] = None,
         graph_name: Optional[str] = None,
         hop_depth: int = 1,
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        chat_id: Optional[str] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
         llm_config: Optional[Dict[str, Any]] = None,
+        padding: int = 0,
     ) -> CompletionResponse
     ```
   </Tab>
@@ -57,12 +65,16 @@ Generate completion using relevant chunks as context.
 - `max_tokens` (int, optional): Maximum tokens in completion
 - `temperature` (float, optional): Model temperature
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to generate the completion (only works for documents ingested with `use_colpali=True`). Defaults to True.
+- `use_reranking` (bool, optional): Override workspace reranking configuration for this request.
 - `graph_name` (str, optional): Optional name of the graph to use for knowledge graph-enhanced retrieval
 - `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `chat_id` (str, optional): Optional chat session ID for persisting conversation history.
 - `schema` (Type[BaseModel] | Dict[str, Any], optional): Optional schema for structured output, can be a Pydantic model or a JSON schema dict
 - `llm_config` (Dict[str, Any], optional): Optional LiteLLM-compatible model configuration (e.g., model name, API key, base URL). Allows overriding the default LLM configuration on a per-query basis. Defaults to None.
+- `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only). Defaults to 0.
 
 ## Metadata Filters
 

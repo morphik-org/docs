@@ -1,0 +1,128 @@
+---
+title: "search_documents"
+description: "Search for documents by name or filename"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def search_documents(
+        query: str,
+        limit: int = 10,
+        filters: Optional[Dict[str, Any]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+    ) -> List[Document]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def search_documents(
+        query: str,
+        limit: int = 10,
+        filters: Optional[Dict[str, Any]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+    ) -> List[Document]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `query` (str): Search query for document names/filenames
+- `limit` (int, optional): Maximum number of documents to return. Defaults to 10.
+- `filters` (Dict[str, Any], optional): Optional metadata filters
+- `folder_name` (str | List[str], optional): Optional folder scope (single name or list of names)
+- `end_user_id` (str, optional): Optional end-user scope
+
+## Returns
+
+- `List[Document]`: List of matching documents
+
+## Metadata Filters
+
+Filters follow the same JSON syntax across the API. See the [Metadata Filtering guide](/concepts/metadata-filtering) for supported operators and typed comparisons. Example:
+
+```python
+filters = {
+    "$and": [
+        {"department": {"$eq": "research"}},
+        {"priority": {"$gte": 40}},
+    ]
+}
+
+docs = db.search_documents("report", filters=filters)
+```
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Basic document name search
+    docs = db.search_documents("quarterly report")
+    for doc in docs:
+        print(f"{doc.external_id}: {doc.filename}")
+
+    # Search with limit and filters
+    docs = db.search_documents(
+        query="invoice",
+        limit=20,
+        filters={"department": "finance"},
+    )
+
+    # Search within specific folders
+    docs = db.search_documents(
+        query="contract",
+        folder_name=["legal", "hr"],
+    )
+
+    # Search scoped to an end user
+    docs = db.search_documents(
+        query="notes",
+        end_user_id="user_456",
+    )
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Basic document name search
+        docs = await db.search_documents("quarterly report")
+        for doc in docs:
+            print(f"{doc.external_id}: {doc.filename}")
+
+        # Search with limit and filters
+        docs = await db.search_documents(
+            query="invoice",
+            limit=20,
+            filters={"department": "finance"},
+        )
+
+        # Search within specific folders
+        docs = await db.search_documents(
+            query="contract",
+            folder_name=["legal", "hr"],
+        )
+
+        # Search scoped to an end user
+        docs = await db.search_documents(
+            query="notes",
+            end_user_id="user_456",
+        )
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- This method searches document names and filenames, not document content. For content-based search, use [`retrieve_chunks`](./retrieve_chunks) or [`retrieve_docs`](./retrieve_docs).
+- The `folder_name` parameter accepts either a single string or a list of folder names for multi-folder search.
+- Results are returned sorted by relevance to the search query.

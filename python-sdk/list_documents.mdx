@@ -15,6 +15,7 @@ description: "List accessible documents in Morphik"
         skip: int = 0,
         limit: int = 100,
         filters: Optional[Dict[str, Any]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
         include_total_count: bool = False,
         include_status_counts: bool = False,
         include_folder_counts: bool = False,
@@ -30,6 +31,7 @@ description: "List accessible documents in Morphik"
         skip: int = 0,
         limit: int = 100,
         filters: Optional[Dict[str, Any]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
         include_total_count: bool = False,
         include_status_counts: bool = False,
         include_folder_counts: bool = False,
@@ -46,6 +48,7 @@ description: "List accessible documents in Morphik"
 - `skip` (int, optional): Number of documents to skip for pagination. Defaults to 0.
 - `limit` (int, optional): Maximum number of documents to return. Defaults to 100.
 - `filters` (Dict[str, Any], optional): Metadata filters to apply
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
 - `include_total_count` (bool, optional): Include total count of matching documents. Defaults to False.
 - `include_status_counts` (bool, optional): Include counts grouped by processing status. Defaults to False.
 - `include_folder_counts` (bool, optional): Include counts grouped by folder. Defaults to False.

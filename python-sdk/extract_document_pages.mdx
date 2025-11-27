@@ -1,0 +1,101 @@
+---
+title: "extract_document_pages"
+description: "Extract specific pages from a document"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def extract_document_pages(
+        document_id: str,
+        start_page: int,
+        end_page: int,
+    ) -> DocumentPagesResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def extract_document_pages(
+        document_id: str,
+        start_page: int,
+        end_page: int,
+    ) -> DocumentPagesResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document to extract pages from
+- `start_page` (int): Starting page number (1-indexed)
+- `end_page` (int): Ending page number (1-indexed)
+
+## Returns
+
+- `DocumentPagesResponse`: Object containing extracted pages with metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Extract pages 1-3 from a document
+    response = db.extract_document_pages(
+        document_id="doc_123abc",
+        start_page=1,
+        end_page=3,
+    )
+
+    print(f"Document ID: {response.document_id}")
+    print(f"Extracted pages {response.start_page}-{response.end_page}")
+    print(f"Total pages in document: {response.total_pages}")
+    print(f"Number of pages extracted: {len(response.pages)}")
+
+    # Pages are base64 encoded
+    for i, page_content in enumerate(response.pages):
+        print(f"Page {response.start_page + i}: {len(page_content)} chars")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Extract pages 1-3 from a document
+        response = await db.extract_document_pages(
+            document_id="doc_123abc",
+            start_page=1,
+            end_page=3,
+        )
+
+        print(f"Document ID: {response.document_id}")
+        print(f"Extracted pages {response.start_page}-{response.end_page}")
+        print(f"Total pages in document: {response.total_pages}")
+        print(f"Number of pages extracted: {len(response.pages)}")
+
+        # Pages are base64 encoded
+        for i, page_content in enumerate(response.pages):
+            print(f"Page {response.start_page + i}: {len(page_content)} chars")
+    ```
+  </Tab>
+</Tabs>
+
+## DocumentPagesResponse Properties
+
+The `DocumentPagesResponse` object has the following properties:
+
+- `document_id` (str): ID of the document
+- `pages` (List[str]): List of page contents as base64 encoded strings
+- `start_page` (int): Start page number (1-indexed)
+- `end_page` (int): End page number (1-indexed)
+- `total_pages` (int): Total number of pages in the document
+
+## Notes
+
+- Page numbers are 1-indexed (first page is 1, not 0).
+- The `pages` list contains base64 encoded representations of each page.
+- Useful for extracting specific sections of large documents.

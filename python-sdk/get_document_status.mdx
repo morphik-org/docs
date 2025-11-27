@@ -1,0 +1,92 @@
+---
+title: "get_document_status"
+description: "Get the current processing status of a document"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_document_status(
+        document_id: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_document_status(
+        document_id: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document to check
+
+## Returns
+
+- `Dict[str, Any]`: Status information including current status, potential errors, and other metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Check document processing status
+    status = db.get_document_status("doc_123abc")
+
+    print(f"Status: {status.get('status')}")
+    if status.get('error'):
+        print(f"Error: {status.get('error')}")
+
+    # Use in a polling loop
+    import time
+
+    while True:
+        status = db.get_document_status("doc_123abc")
+        if status.get('status') == 'completed':
+            print("Document processing complete!")
+            break
+        elif status.get('status') == 'failed':
+            print(f"Document processing failed: {status.get('error')}")
+            break
+        time.sleep(2)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    import asyncio
+
+    async with AsyncMorphik() as db:
+        # Check document processing status
+        status = await db.get_document_status("doc_123abc")
+
+        print(f"Status: {status.get('status')}")
+        if status.get('error'):
+            print(f"Error: {status.get('error')}")
+
+        # Use in a polling loop
+        while True:
+            status = await db.get_document_status("doc_123abc")
+            if status.get('status') == 'completed':
+                print("Document processing complete!")
+                break
+            elif status.get('status') == 'failed':
+                print(f"Document processing failed: {status.get('error')}")
+                break
+            await asyncio.sleep(2)
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- Common status values include: `"processing"`, `"completed"`, `"failed"`
+- This is a lightweight endpoint useful for checking progress without fetching the full document.
+- The SDK also provides a helper method for polling: see the document ingestion methods which can wait for completion automatically.

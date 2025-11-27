@@ -1,0 +1,89 @@
+---
+title: "get_folders_summary"
+description: "Get summary information for all accessible folders"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_folders_summary() -> List[FolderSummary]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_folders_summary() -> List[FolderSummary]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+This method takes no parameters.
+
+## Returns
+
+- `List[FolderSummary]`: List of folder summaries with document counts
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Get summary of all folders
+    summaries = db.get_folders_summary()
+
+    for folder in summaries:
+        print(f"Folder: {folder.name}")
+        print(f"  ID: {folder.id}")
+        print(f"  Description: {folder.description}")
+        print(f"  Document count: {folder.doc_count}")
+        print(f"  Last updated: {folder.updated_at}")
+        print("---")
+
+    # Find folders with most documents
+    sorted_folders = sorted(summaries, key=lambda f: f.doc_count, reverse=True)
+    print(f"Largest folder: {sorted_folders[0].name} ({sorted_folders[0].doc_count} docs)")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Get summary of all folders
+        summaries = await db.get_folders_summary()
+
+        for folder in summaries:
+            print(f"Folder: {folder.name}")
+            print(f"  ID: {folder.id}")
+            print(f"  Description: {folder.description}")
+            print(f"  Document count: {folder.doc_count}")
+            print(f"  Last updated: {folder.updated_at}")
+            print("---")
+
+        # Find folders with most documents
+        sorted_folders = sorted(summaries, key=lambda f: f.doc_count, reverse=True)
+        print(f"Largest folder: {sorted_folders[0].name} ({sorted_folders[0].doc_count} docs)")
+    ```
+  </Tab>
+</Tabs>
+
+## FolderSummary Properties
+
+The `FolderSummary` objects have the following properties:
+
+- `id` (str): Unique folder identifier
+- `name` (str): Folder name
+- `description` (str | None): Folder description
+- `doc_count` (int): Number of documents in the folder
+- `updated_at` (str | None): Last update timestamp
+
+## Notes
+
+- This is a lightweight method for getting an overview of all folders.
+- For more detailed information including document lists and status counts, use [`get_folders_details`](./get_folders_details).
+- Returns only folders accessible to the authenticated user.

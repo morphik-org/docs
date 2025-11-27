@@ -1,0 +1,184 @@
+---
+title: "retrieve_chunks_grouped"
+description: "Retrieve relevant chunks with grouping for UI display"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def retrieve_chunks_grouped(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+        use_reranking: Optional[bool] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+        padding: int = 0,
+        output_format: Optional[str] = None,
+        graph_name: Optional[str] = None,
+        hop_depth: int = 1,
+        include_paths: bool = False,
+    ) -> GroupedChunkResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def retrieve_chunks_grouped(
+        query: str,
+        filters: Optional[Dict[str, Any]] = None,
+        k: int = 4,
+        min_score: float = 0.0,
+        use_colpali: bool = True,
+        use_reranking: Optional[bool] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
+        padding: int = 0,
+        output_format: Optional[str] = None,
+        graph_name: Optional[str] = None,
+        hop_depth: int = 1,
+        include_paths: bool = False,
+    ) -> GroupedChunkResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `query` (str): Search query text
+- `filters` (Dict[str, Any], optional): Optional metadata filters
+- `k` (int, optional): Number of results. Defaults to 4.
+- `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
+- `use_colpali` (bool, optional): Whether to use ColPali-style embedding model. Defaults to True.
+- `use_reranking` (bool, optional): Override workspace reranking configuration for this request.
+- `folder_name` (str | List[str], optional): Optional folder scope (single name or list of names)
+- `end_user_id` (str, optional): Optional end-user scope
+- `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks. Defaults to 0.
+- `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` for presigned URLs or `"base64"` (default) for base64 content.
+- `graph_name` (str, optional): Name of the graph to use for knowledge graph-enhanced retrieval
+- `hop_depth` (int, optional): Number of relationship hops to traverse in the graph. Defaults to 1.
+- `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
+
+## Returns
+
+- `GroupedChunkResponse`: Response containing both flat chunks and grouped chunks for UI display
+
+## Metadata Filters
+
+Filters follow the same JSON syntax across the API. See the [Metadata Filtering guide](/concepts/metadata-filtering) for supported operators and typed comparisons.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Basic grouped retrieval
+    response = db.retrieve_chunks_grouped(
+        query="What are the key findings?",
+        k=5,
+    )
+
+    print(f"Total results: {response.total_results}")
+    print(f"Has padding: {response.has_padding}")
+
+    # Access flat list of chunks (backward compatible)
+    for chunk in response.chunks:
+        print(f"Score: {chunk.score}, Content: {chunk.content[:100]}...")
+
+    # Access grouped chunks for UI display
+    for group in response.groups:
+        print(f"\n--- Group with {group.total_chunks} chunks ---")
+        print(f"Main chunk: {group.main_chunk.content[:100]}...")
+        for padding_chunk in group.padding_chunks:
+            print(f"  Padding: {padding_chunk.content[:50]}...")
+
+    # With padding for context
+    response = db.retrieve_chunks_grouped(
+        query="quarterly results",
+        k=3,
+        padding=2,  # Get 2 chunks before/after each match
+        folder_name="reports",
+    )
+
+    # With knowledge graph enhancement
+    response = db.retrieve_chunks_grouped(
+        query="product features",
+        graph_name="product_graph",
+        hop_depth=2,
+        include_paths=True,
+    )
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Basic grouped retrieval
+        response = await db.retrieve_chunks_grouped(
+            query="What are the key findings?",
+            k=5,
+        )
+
+        print(f"Total results: {response.total_results}")
+        print(f"Has padding: {response.has_padding}")
+
+        # Access flat list of chunks (backward compatible)
+        for chunk in response.chunks:
+            print(f"Score: {chunk.score}, Content: {chunk.content[:100]}...")
+
+        # Access grouped chunks for UI display
+        for group in response.groups:
+            print(f"\n--- Group with {group.total_chunks} chunks ---")
+            print(f"Main chunk: {group.main_chunk.content[:100]}...")
+            for padding_chunk in group.padding_chunks:
+                print(f"  Padding: {padding_chunk.content[:50]}...")
+
+        # With padding for context
+        response = await db.retrieve_chunks_grouped(
+            query="quarterly results",
+            k=3,
+            padding=2,  # Get 2 chunks before/after each match
+            folder_name="reports",
+        )
+
+        # With knowledge graph enhancement
+        response = await db.retrieve_chunks_grouped(
+            query="product features",
+            graph_name="product_graph",
+            hop_depth=2,
+            include_paths=True,
+        )
+    ```
+  </Tab>
+</Tabs>
+
+## GroupedChunkResponse Properties
+
+The `GroupedChunkResponse` object has the following properties:
+
+- `chunks` (List[ChunkResult]): Flat list of all chunks (for backward compatibility)
+- `groups` (List[ChunkGroup]): Grouped chunks for UI display
+- `total_results` (int): Total number of unique chunks
+- `has_padding` (bool): Whether padding was applied to any results
+
+## ChunkGroup Properties
+
+Each `ChunkGroup` in `groups` has:
+
+- `main_chunk` (ChunkResult): The primary matched chunk
+- `padding_chunks` (List[ChunkResult]): Surrounding context chunks
+- `total_chunks` (int): Total number of chunks in this group
+
+## Notes
+
+- This method is similar to [`retrieve_chunks`](./retrieve_chunks) but provides additional grouping for UI display.
+- The `chunks` list provides backward compatibility with flat chunk lists.
+- The `groups` list organizes results with their padding context, ideal for building search result UIs.
+- When `padding` is specified, surrounding chunks are included in `padding_chunks` for each group.
+- Knowledge graph parameters (`graph_name`, `hop_depth`, `include_paths`) enable graph-enhanced retrieval.

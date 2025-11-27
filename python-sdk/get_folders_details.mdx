@@ -1,0 +1,190 @@
+---
+title: "get_folders_details"
+description: "Get detailed information about folders with optional document statistics"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_folders_details(
+        identifiers: Optional[List[str]] = None,
+        include_document_count: bool = True,
+        include_status_counts: bool = False,
+        include_documents: bool = False,
+        document_filters: Optional[Dict[str, Any]] = None,
+        document_skip: int = 0,
+        document_limit: int = 25,
+        document_fields: Optional[List[str]] = None,
+        sort_by: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+    ) -> FolderDetailsResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_folders_details(
+        identifiers: Optional[List[str]] = None,
+        include_document_count: bool = True,
+        include_status_counts: bool = False,
+        include_documents: bool = False,
+        document_filters: Optional[Dict[str, Any]] = None,
+        document_skip: int = 0,
+        document_limit: int = 25,
+        document_fields: Optional[List[str]] = None,
+        sort_by: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+    ) -> FolderDetailsResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `identifiers` (List[str], optional): List of folder IDs or names. If None, returns all accessible folders.
+- `include_document_count` (bool, optional): Include total document count. Defaults to True.
+- `include_status_counts` (bool, optional): Include document counts grouped by processing status. Defaults to False.
+- `include_documents` (bool, optional): Include paginated document list. Defaults to False.
+- `document_filters` (Dict[str, Any], optional): Optional metadata filters for documents.
+- `document_skip` (int, optional): Number of documents to skip for pagination. Defaults to 0.
+- `document_limit` (int, optional): Maximum documents per folder. Defaults to 25.
+- `document_fields` (List[str], optional): Optional list of fields to project for documents (dot notation supported).
+- `sort_by` (str, optional): Field to sort documents by. Options: "created_at", "updated_at", "filename", "external_id".
+- `sort_direction` (str, optional): Sort direction. Options: "asc", "desc".
+
+## Returns
+
+- `FolderDetailsResponse`: Response containing detailed folder information
+
+## Metadata Filters
+
+Filters follow the same JSON syntax across the API. See the [Metadata Filtering guide](/concepts/metadata-filtering) for supported operators and typed comparisons.
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Get details for all folders with document counts
+    response = db.get_folders_details()
+    for folder_detail in response.folders:
+        folder = folder_detail.folder
+        doc_info = folder_detail.document_info
+        print(f"Folder: {folder.name}")
+        if doc_info and doc_info.total_count is not None:
+            print(f"  Total documents: {doc_info.total_count}")
+
+    # Get specific folders with status counts
+    response = db.get_folders_details(
+        identifiers=["reports", "invoices"],
+        include_status_counts=True,
+    )
+    for folder_detail in response.folders:
+        doc_info = folder_detail.document_info
+        if doc_info and doc_info.status_counts:
+            print(f"{folder_detail.folder.name} status breakdown:")
+            for status, count in doc_info.status_counts.items():
+                print(f"  {status}: {count}")
+
+    # Get folders with document list
+    response = db.get_folders_details(
+        identifiers=["marketing"],
+        include_documents=True,
+        document_limit=10,
+        sort_by="updated_at",
+        sort_direction="desc",
+    )
+    for folder_detail in response.folders:
+        doc_info = folder_detail.document_info
+        if doc_info and doc_info.documents:
+            print(f"Recent documents in {folder_detail.folder.name}:")
+            for doc in doc_info.documents:
+                print(f"  - {doc.filename}")
+
+    # With document filtering and field projection
+    response = db.get_folders_details(
+        include_documents=True,
+        document_filters={"department": "sales"},
+        document_fields=["external_id", "filename", "metadata.department"],
+        document_limit=50,
+    )
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Get details for all folders with document counts
+        response = await db.get_folders_details()
+        for folder_detail in response.folders:
+            folder = folder_detail.folder
+            doc_info = folder_detail.document_info
+            print(f"Folder: {folder.name}")
+            if doc_info and doc_info.total_count is not None:
+                print(f"  Total documents: {doc_info.total_count}")
+
+        # Get specific folders with status counts
+        response = await db.get_folders_details(
+            identifiers=["reports", "invoices"],
+            include_status_counts=True,
+        )
+        for folder_detail in response.folders:
+            doc_info = folder_detail.document_info
+            if doc_info and doc_info.status_counts:
+                print(f"{folder_detail.folder.name} status breakdown:")
+                for status, count in doc_info.status_counts.items():
+                    print(f"  {status}: {count}")
+
+        # Get folders with document list
+        response = await db.get_folders_details(
+            identifiers=["marketing"],
+            include_documents=True,
+            document_limit=10,
+            sort_by="updated_at",
+            sort_direction="desc",
+        )
+        for folder_detail in response.folders:
+            doc_info = folder_detail.document_info
+            if doc_info and doc_info.documents:
+                print(f"Recent documents in {folder_detail.folder.name}:")
+                for doc in doc_info.documents:
+                    print(f"  - {doc.filename}")
+
+        # With document filtering and field projection
+        response = await db.get_folders_details(
+            include_documents=True,
+            document_filters={"department": "sales"},
+            document_fields=["external_id", "filename", "metadata.department"],
+            document_limit=50,
+        )
+    ```
+  </Tab>
+</Tabs>
+
+## Response Structure
+
+### FolderDetailsResponse
+
+- `folders` (List[FolderDetails]): List of folder details
+
+### FolderDetails
+
+- `folder` (FolderInfo): Folder information
+- `document_info` (FolderDocumentInfo | None): Document statistics and list
+
+### FolderDocumentInfo
+
+- `total_count` (int | None): Total document count (when `include_document_count=True`)
+- `status_counts` (Dict[str, int] | None): Document counts by status (when `include_status_counts=True`)
+- `documents` (List[Document] | None): Paginated document list (when `include_documents=True`)
+
+## Notes
+
+- For a lightweight summary, use [`get_folders_summary`](./get_folders_summary) instead.
+- The `identifiers` parameter accepts both folder IDs and folder names.
+- Document pagination uses `document_skip` and `document_limit` to control the document list.
+- Use `document_fields` to reduce response size by projecting only needed fields.
