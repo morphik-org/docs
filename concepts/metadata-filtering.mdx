@@ -59,6 +59,56 @@ doc = db.ingest_text(
 
 If you omit a hint, Morphik infers one automatically for simple scalars, but explicitly declaring types is recommended for reliable range queries.
 
+### DateTime and Timezone Behavior
+
+Morphik preserves your timezone format exactly as provided:
+
+| Input | Stored As | Notes |
+| --- | --- | --- |
+| `datetime(2024, 1, 15)` (naive) | `"2024-01-15T00:00:00"` | No timezone added |
+| `datetime(2024, 1, 15, tzinfo=UTC)` | `"2024-01-15T00:00:00+00:00"` | Timezone preserved |
+| `"2024-01-15T12:00:00Z"` (string) | `"2024-01-15T12:00:00+00:00"` | Z converted to +00:00 |
+| `1705312800` (UNIX timestamp) | `"2024-01-15T10:00:00+00:00"` | Timestamps are inherently UTC |
+
+**SDK Type Reconstruction:** When you retrieve a `Document` via the Python SDK, datetime/date/decimal values in `metadata` are automatically reconstructed to their Python types using the `metadata_types` hints. This means you get back what you put in:
+
+```python
+from datetime import datetime
+
+# Ingest with naive datetime
+doc = db.ingest_text("...", metadata={"created": datetime(2024, 1, 15)})
+
+# Retrieve - metadata["created"] is a datetime object, not a string
+retrieved = db.get_document(doc.external_id)
+print(type(retrieved.metadata["created"]))  # <class 'datetime.datetime'>
+print(retrieved.metadata["created"].tzinfo)  # None (still naive)
+```
+
+### Mixed Timezone Formats
+
+**Morphik handles mixed formats correctly** - filtering and comparisons work even if some documents have naive datetimes and others have timezone-aware ones:
+
+```python
+from datetime import datetime, UTC
+
+# Mixed formats across documents - Morphik handles this fine
+db.ingest_text("Doc A", metadata={"ts": datetime(2024, 1, 15)})             # naive
+db.ingest_text("Doc B", metadata={"ts": datetime(2024, 6, 15, tzinfo=UTC)}) # aware
+
+# Filtering works correctly
+results = db.list_documents(filters={"ts": {"$gte": "2024-05-01"}})  # Returns Doc B
+```
+
+<Warning>
+  **Python comparisons fail with mixed formats.** If you retrieve mixed-format datetimes and compare them locally, Python raises `TypeError`:
+
+  ```python
+  sorted([naive_dt, aware_dt])  # TypeError: can't compare offset-naive and offset-aware
+  ```
+
+  **Recommendation:** Stay consistent - pick one format (preferably timezone-aware with UTC) and use it throughout. Let Morphik handle filtering rather than sorting in Python.
+</Warning>
+
 ## Implicit vs Explicit Syntax
 
 - **Implicit equality** – Bare key/value pairs (`{"status": "active"}`) use JSON containment and are ideal for simple matching. They also check whether an array contains the value.
