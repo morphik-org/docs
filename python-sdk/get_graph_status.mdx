@@ -1,0 +1,87 @@
+---
+title: "get_graph_status"
+description: "Get the current status of a graph with pipeline stage information"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_graph_status(
+        graph_name: str,
+        folder_name: Optional[str] = None,
+        end_user_id: Optional[str] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_graph_status(
+        graph_name: str,
+        folder_name: Optional[str] = None,
+        end_user_id: Optional[str] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `graph_name` (str): Name of the graph to check
+- `folder_name` (str, optional): Optional folder name for scoping
+- `end_user_id` (str, optional): Optional end user ID for scoping
+
+## Returns
+
+- `Dict[str, Any]`: Status information containing status, pipeline_stage (if processing), and other metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Check graph status
+    status = db.get_graph_status("my_knowledge_graph")
+
+    print(f"Status: {status.get('status')}")
+    if status.get('pipeline_stage'):
+        print(f"Pipeline stage: {status.get('pipeline_stage')}")
+
+    # Check with folder scoping
+    status = db.get_graph_status(
+        graph_name="team_graph",
+        folder_name="engineering",
+    )
+    print(f"Graph status in folder: {status.get('status')}")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Check graph status
+        status = await db.get_graph_status("my_knowledge_graph")
+
+        print(f"Status: {status.get('status')}")
+        if status.get('pipeline_stage'):
+            print(f"Pipeline stage: {status.get('pipeline_stage')}")
+
+        # Check with folder scoping
+        status = await db.get_graph_status(
+            graph_name="team_graph",
+            folder_name="engineering",
+        )
+        print(f"Graph status in folder: {status.get('status')}")
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- This is a lightweight endpoint that examines local status metadata and augments it with remote pipeline details when available.
+- Use this to monitor graph creation or update progress.
+- For polling until completion, consider using [`wait_for_graph_completion`](./wait_for_graph_completion) instead.

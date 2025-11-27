@@ -162,9 +162,11 @@
             "group": "Document Retrieval",
             "pages": [
               "python-sdk/retrieve_chunks",
+              "python-sdk/retrieve_chunks_grouped",
               "python-sdk/retrieve_docs",
               "python-sdk/query",
               "python-sdk/list_documents",
+              "python-sdk/search_documents",
               "python-sdk/get_document",
               "python-sdk/get_document_by_filename"
             ]
@@ -176,6 +178,8 @@
             "python-sdk/create_folder",
             "python-sdk/list_folders",
             "python-sdk/get_folder",
+            "python-sdk/get_folders_summary",
+            "python-sdk/get_folders_details",
             "python-sdk/add_document_to_folder",
             "python-sdk/remove_document_from_folder",
             "python-sdk/delete_folder",
@@ -204,9 +208,12 @@
             "group": "Knowledge Graph Operations",
             "pages": [
               "python-sdk/create_graph",
+              "python-sdk/update_graph",
               "python-sdk/get_graph",
               "python-sdk/list_graphs",
               "python-sdk/get_graph_visualization",
+              "python-sdk/get_graph_status",
+              "python-sdk/wait_for_graph_completion",
               "python-sdk/check_workflow_status"
             ]
           },
@@ -220,7 +227,12 @@
           {
             "group": "Document Management",
             "pages": [
-              "python-sdk/get_document_download_url"
+              "python-sdk/get_document_file",
+              "python-sdk/extract_document_pages",
+              "python-sdk/get_document_download_url",
+              "python-sdk/get_document_status",
+              "python-sdk/delete_document",
+              "python-sdk/delete_document_by_filename"
             ]
           },
           {

@@ -6,12 +6,18 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
 <Tabs>
   <Tab title="Sync">
     ```python
-    def batch_get_documents(document_ids: List[str]) -> List[Document]
+    def batch_get_documents(
+        document_ids: List[str],
+        folder_name: Optional[Union[str, List[str]]] = None,
+    ) -> List[Document]
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    async def batch_get_documents(document_ids: List[str]) -> List[Document]
+    async def batch_get_documents(
+        document_ids: List[str],
+        folder_name: Optional[Union[str, List[str]]] = None,
+    ) -> List[Document]
     ```
   </Tab>
 </Tabs>
@@ -19,6 +25,7 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
 ## Parameters
 
 - `document_ids` (List[str]): List of document IDs to retrieve
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
 
 ## Returns
 

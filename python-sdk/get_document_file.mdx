@@ -1,0 +1,74 @@
+---
+title: "get_document_file"
+description: "Download the raw file content of a document"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_document_file(
+        document_id: str,
+    ) -> bytes
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_document_file(
+        document_id: str,
+    ) -> bytes
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document to download
+
+## Returns
+
+- `bytes`: Raw file content as bytes
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Download a document's raw file
+    doc_id = "doc_123abc"
+    file_content = db.get_document_file(doc_id)
+
+    # Save to local file
+    with open("downloaded_file.pdf", "wb") as f:
+        f.write(file_content)
+
+    print(f"Downloaded {len(file_content)} bytes")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+    import aiofiles
+
+    async with AsyncMorphik() as db:
+        # Download a document's raw file
+        doc_id = "doc_123abc"
+        file_content = await db.get_document_file(doc_id)
+
+        # Save to local file
+        async with aiofiles.open("downloaded_file.pdf", "wb") as f:
+            await f.write(file_content)
+
+        print(f"Downloaded {len(file_content)} bytes")
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- This method returns the raw file bytes, which you can save to disk or process in memory.
+- For getting a downloadable URL instead of raw bytes, use [`get_document_download_url`](./get_document_download_url).
+- The returned bytes match the original file that was uploaded/ingested.

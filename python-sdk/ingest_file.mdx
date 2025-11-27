@@ -72,3 +72,17 @@ Use Python-native values (e.g., `datetime`, `date`, `Decimal`) in the `metadata`
     ```
   </Tab>
 </Tabs>
+
+## Async Processing
+
+Document ingestion is processed asynchronously. The returned `Document` object contains an `external_id` that you can use to track the document's processing status:
+
+- Use [`get_document_status`](./get_document_status) to check if processing is complete
+- The document won't appear in retrieval results until processing completes
+
+```python
+# Check processing status
+doc = db.ingest_file("document.pdf")
+status = db.get_document_status(doc.external_id)
+print(f"Status: {status.get('status')}")  # "processing", "completed", or "failed"
+```

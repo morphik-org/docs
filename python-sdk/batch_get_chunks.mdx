@@ -6,12 +6,22 @@ description: "Retrieve specific chunks by their document ID and chunk number"
 <Tabs>
   <Tab title="Sync">
     ```python
-    def batch_get_chunks(sources: List[Union[ChunkSource, Dict[str, Any]]]) -> List[FinalChunkResult]
+    def batch_get_chunks(
+        sources: List[Union[ChunkSource, Dict[str, Any]]],
+        folder_name: Optional[Union[str, List[str]]] = None,
+        use_colpali: bool = True,
+        output_format: Optional[str] = None,
+    ) -> List[FinalChunkResult]
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    async def batch_get_chunks(sources: List[Union[ChunkSource, Dict[str, Any]]]) -> List[FinalChunkResult]
+    async def batch_get_chunks(
+        sources: List[Union[ChunkSource, Dict[str, Any]]],
+        folder_name: Optional[Union[str, List[str]]] = None,
+        use_colpali: bool = True,
+        output_format: Optional[str] = None,
+    ) -> List[FinalChunkResult]
     ```
   </Tab>
 </Tabs>
@@ -19,6 +29,9 @@ description: "Retrieve specific chunks by their document ID and chunk number"
 ## Parameters
 
 - `sources` (List[Union[ChunkSource, Dict[str, Any]]]): List of ChunkSource objects or dictionaries with document_id and chunk_number
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `use_colpali` (bool, optional): Whether to request multimodal chunks when available. Defaults to True.
+- `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` to receive presigned URLs; omit or set to `"base64"` (default) to receive base64 content.
 
 ## Returns
 
