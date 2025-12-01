@@ -7,7 +7,7 @@ description: "Retrieve relevant chunks from Morphik"
   <Tab title="Sync">
     ```python
     def retrieve_chunks(
-        query: str,
+        query: Optional[str] = None,
         filters: Optional[Dict[str, Any]] = None,
         k: int = 4,
         min_score: float = 0.0,
@@ -15,13 +15,14 @@ description: "Retrieve relevant chunks from Morphik"
         folder_name: Optional[Union[str, List[str]]] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
+        query_image: Optional[str] = None,
     ) -> List[FinalChunkResult]
     ```
   </Tab>
   <Tab title="Async">
     ```python
     async def retrieve_chunks(
-        query: str,
+        query: Optional[str] = None,
         filters: Optional[Dict[str, Any]] = None,
         k: int = 4,
         min_score: float = 0.0,
@@ -29,6 +30,7 @@ description: "Retrieve relevant chunks from Morphik"
         folder_name: Optional[Union[str, List[str]]] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
+        query_image: Optional[str] = None,
     ) -> List[FinalChunkResult]
     ```
   </Tab>
@@ -36,7 +38,7 @@ description: "Retrieve relevant chunks from Morphik"
 
 ## Parameters
 
-- `query` (str): Search query text
+- `query` (str, optional): Search query text. Mutually exclusive with `query_image`.
 - `filters` (Dict[str, Any], optional): Optional metadata filters
 - `k` (int, optional): Number of results. Defaults to 4.
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
@@ -44,6 +46,7 @@ description: "Retrieve relevant chunks from Morphik"
 - `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
 - `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only). Defaults to 0.
 - `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` to receive presigned URLs; omit or set to `"base64"` (default) to receive base64 content.
+- `query_image` (str, optional): Base64-encoded image for reverse image search. Mutually exclusive with `query`. Requires `use_colpali=True`.
 
 ## Metadata Filters
 
@@ -140,3 +143,61 @@ The `FinalChunkResult` objects returned by this method have the following proper
 - The `download_url` field may be populated for image chunks. When using `output_format="url"`, it will typically match `content` for those chunks.
 
 Tip: To download the original raw file for a document, use [`get_document_download_url`](./get_document_download_url).
+
+## Reverse Image Search
+
+You can search using an image instead of text by providing `query_image` with a base64-encoded image. This enables finding visually similar content in your documents.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    import base64
+    from morphik import Morphik
+
+    db = Morphik()
+
+    # Load and encode your query image
+    with open("query_image.png", "rb") as f:
+        image_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+    # Search using the image
+    chunks = db.retrieve_chunks(
+        query_image=image_b64,
+        use_colpali=True,  # Required for image queries
+        k=5,
+    )
+
+    for chunk in chunks:
+        print(f"Score: {chunk.score}")
+        print(f"Document ID: {chunk.document_id}")
+        print("---")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    import base64
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        # Load and encode your query image
+        with open("query_image.png", "rb") as f:
+            image_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+        # Search using the image
+        chunks = await db.retrieve_chunks(
+            query_image=image_b64,
+            use_colpali=True,  # Required for image queries
+            k=5,
+        )
+
+        for chunk in chunks:
+            print(f"Score: {chunk.score}")
+            print(f"Document ID: {chunk.document_id}")
+            print("---")
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Reverse image search requires documents to be ingested with `use_colpali=True`. You must provide either `query` or `query_image`, but not both.
+</Note>
