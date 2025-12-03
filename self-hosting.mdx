@@ -103,22 +103,21 @@ For users who need to run Morphik on their own infrastructure, we provide two in
             <Tab title="macOS">
               ```bash
               # Install via Homebrew
-              brew install poppler tesseract libmagic
+              brew install poppler libmagic
               ```
             </Tab>
             <Tab title="Ubuntu/Debian">
               ```bash
               # Install via apt
               sudo apt-get update
-              sudo apt-get install -y poppler-utils tesseract-ocr libmagic-dev
+              sudo apt-get install -y poppler-utils libmagic-dev
               ```
             </Tab>
             <Tab title="Windows">
               For Windows, you may need to install these dependencies manually:
 
               1. **Poppler**: Download from [poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/)
-              2. **Tesseract**: Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
-              3. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
+              2. **libmagic**: This is included in the python-magic-bin package which will be installed with pip
             </Tab>
           </Tabs>
           If you encounter database initialization issues within Docker, you may need to manually initialize the schema:

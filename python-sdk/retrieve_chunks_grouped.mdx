@@ -57,7 +57,10 @@ description: "Retrieve relevant chunks with grouping for UI display"
 - `folder_name` (str | List[str], optional): Optional folder scope (single name or list of names)
 - `end_user_id` (str, optional): Optional end-user scope
 - `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks. Defaults to 0.
-- `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` for presigned URLs or `"base64"` (default) for base64 content.
+- `output_format` (str, optional): Controls how image chunks are returned:
+  - `"base64"` (default): Returns base64-encoded image data
+  - `"url"`: Returns presigned HTTPS URLs
+  - `"text"`: Converts images to markdown text via OCR (faster inference, best for text-heavy documents)
 - `graph_name` (str, optional): Name of the graph to use for knowledge graph-enhanced retrieval
 - `hop_depth` (int, optional): Number of relationship hops to traverse in the graph. Defaults to 1.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
