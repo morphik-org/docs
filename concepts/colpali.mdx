@@ -68,6 +68,39 @@ db.query("At what time-step did we see the highest GDP growth rate?", use_colpal
 
 So instead of having to implement the ColPali pipeline from scratch, you can use Morphik to do it for you in a single line of code!
 
+## Controlling Output Format
+
+When retrieving ColPali chunks (which are page images), you can control how the images are returned using the `output_format` parameter:
+
+```python
+# Return as base64-encoded data (default)
+chunks = db.retrieve_chunks("quarterly results", use_colpali=True)
+
+# Return as presigned URLs (useful for web UIs)
+chunks = db.retrieve_chunks("quarterly results", use_colpali=True, output_format="url")
+
+# Convert images to markdown text via OCR
+chunks = db.retrieve_chunks("quarterly results", use_colpali=True, output_format="text")
+```
+
+The three output formats are:
+- **`"base64"`** (default): Returns base64-encoded image data
+- **`"url"`**: Returns presigned HTTPS URLs, convenient for LLMs and UIs that accept remote image URLs
+- **`"text"`**: Converts page images to markdown text via OCR
+
+### Choosing Between Formats
+
+**base64 vs url**: Both formats pass images to LLMs for visual understanding and produce similar inference results. However, `url` is lighter on network transfer since only the URL is sent to your application (the LLM fetches the image directly). This can result in faster response times, especially when working with multiple images.
+
+**When to use text**: Passing images to LLMs for inference can be slow and consume significant context tokens. Use `output_format="text"` when:
+- You need **faster inference** speeds
+- Your documents are **primarily text-based** (reports, articles, contracts)
+- You're hitting **context length limits**
+
+<Note>
+If you're experiencing context limit issues with image-based retrieval, it may be because images aren't being passed correctly to the model. See [Generating Completions with Retrieved Chunks](/cookbooks/generating-completions-with-retrieved-chunks) for examples of properly passing images (both base64 and URLs) to vision-capable models like GPT-4o.
+</Note>
+
 
 
 

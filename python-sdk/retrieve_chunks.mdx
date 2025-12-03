@@ -45,7 +45,10 @@ description: "Retrieve relevant chunks from Morphik"
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to retrieve the chunks (only works for documents ingested with `use_colpali=True`). Defaults to True.
 - `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
 - `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks (ColPali only). Defaults to 0.
-- `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` to receive presigned URLs; omit or set to `"base64"` (default) to receive base64 content.
+- `output_format` (str, optional): Controls how image chunks are returned:
+  - `"base64"` (default): Returns base64-encoded image data
+  - `"url"`: Returns presigned HTTPS URLs
+  - `"text"`: Converts images to markdown text via OCR
 - `query_image` (str, optional): Base64-encoded image for reverse image search. Mutually exclusive with `query`. Requires `use_colpali=True`.
 
 ## Metadata Filters
@@ -135,12 +138,29 @@ The `FinalChunkResult` objects returned by this method have the following proper
 - `filename` (Optional[str]): Original filename
 - `download_url` (Optional[str]): URL to download full document 
 
-## Image URL output
+## Output Format Options
 
-- When `output_format="url"` is provided, image chunks are returned as presigned HTTPS URLs in `content`. This is convenient for UIs and LLMs that accept remote image URLs (e.g., via `image_url`).
-- When `output_format` is omitted or set to `"base64"` (default), image chunks are returned as base64 data (the SDK attempts to decode these into a `PIL.Image` for `FinalChunkResult.content`).
+- **`"base64"` (default)**: Image chunks are returned as base64 data (the SDK attempts to decode these into a `PIL.Image` for `FinalChunkResult.content`).
+- **`"url"`**: Image chunks are returned as presigned HTTPS URLs in `content`. This is convenient for UIs and LLMs that accept remote image URLs (e.g., via `image_url`).
+- **`"text"`**: Image chunks are converted to markdown text via OCR. Use this when you need faster inference or when documents are mostly text-based.
 - Text chunks are unaffected by `output_format` and are always returned as strings.
 - The `download_url` field may be populated for image chunks. When using `output_format="url"`, it will typically match `content` for those chunks.
+
+### When to Use Each Format
+
+| Format | Best For |
+|--------|----------|
+| `base64` | Direct image processing, local applications |
+| `url` | Web UIs, LLMs with vision capabilities (lighter on network) |
+| `text` | Faster inference, text-heavy documents, context length concerns |
+
+<Note>
+**base64 vs url**: Both formats pass images to LLMs for visual understanding and produce similar results. However, `url` is lighter on network transfer since only the URL is sent to your application (the LLM fetches the image directly). This can result in faster response times, especially with multiple images.
+
+**When to use text**: Passing images to LLMs for inference can be slow and consume significant context tokens. Use `output_format="text"` when you need faster inference speeds or when your documents are primarily text-based.
+
+If you're hitting context limits with images, it may be because they aren't being passed correctly to the model. See [Generating Completions with Retrieved Chunks](/cookbooks/generating-completions-with-retrieved-chunks) for examples of properly passing images (both base64 and URLs) to vision-capable models like GPT-4o.
+</Note>
 
 Tip: To download the original raw file for a document, use [`get_document_download_url`](./get_document_download_url).
 
