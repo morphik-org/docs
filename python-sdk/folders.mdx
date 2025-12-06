@@ -7,7 +7,7 @@ description: "Organize and isolate data into logical folder groups in Morphik"
 
 Folders in Morphik provide a way to organize documents into logical groups. This is particularly useful for multi-project environments where you want to maintain separation between different contexts. Documents within a folder are isolated from those in other folders, allowing for clean organization and data separation.  
 
-> ℹ️ All folder APIs accept **either the folder’s UUID or its name**. Use whichever identifier you already have—Morphik resolves it automatically.
+> ℹ️ All folder APIs accept **folder UUIDs, names, or canonical paths** (e.g., `"/projects/alpha/specs"`). Folder objects expose `full_path`, `parent_id`, `depth`, and `child_count`; documents and graphs expose `folder_path` to mirror server responses.
 
 ## Creating and Accessing Folders
 
@@ -20,9 +20,12 @@ Folders in Morphik provide a way to organize documents into logical groups. This
     
     # Create a new folder
     folder = db.create_folder("marketing_docs")
+
+    # Create a nested folder (parents created automatically)
+    nested = db.create_folder(full_path="/projects/alpha/specs")
     
-    # Access an existing folder by name or UUID
-    folder = db.get_folder("marketing_docs")
+    # Access an existing folder by name/path or UUID
+    folder = db.get_folder("/projects/alpha")
     folder_by_id = db.get_folder(folder.id)
     ```
   </Tab>
@@ -32,10 +35,12 @@ Folders in Morphik provide a way to organize documents into logical groups. This
     
     async with AsyncMorphik() as db:
         # Create a new folder
-        folder = db.create_folder("marketing_docs")
+        folder = await db.create_folder("marketing_docs")
+
+        nested = await db.create_folder(full_path="/projects/alpha/specs")
         
-        # Access an existing folder by name or UUID
-        folder = await db.get_folder("marketing_docs")
+        # Access an existing folder by name/path or UUID
+        folder = await db.get_folder("/projects/alpha")
         folder_by_id = await db.get_folder(folder.id)
     ```
   </Tab>
@@ -88,6 +93,23 @@ Once you have a folder object, all operations performed on it are scoped to that
   </Tab>
 </Tabs>
 
+## Nested Folders and Scope Depth
+
+Folders can be nested arbitrarily. Use canonical paths (leading slash optional) to address them, and include descendant folders in retrieval/listing by setting `folder_depth`:
+
+```python
+folder = db.create_folder(full_path="/projects/alpha/specs")
+
+# Query across /projects/alpha and all children
+chunks = db.retrieve_chunks(
+    query="design notes",
+    folder_name="/projects/alpha",
+    folder_depth=-1,  # -1: all descendants, 0/None: exact only, n>0: include up to n levels
+)
+```
+
+Folder-scoped helpers inherit the path automatically, so `folder.retrieve_chunks(..., folder_depth=-1)` will include its children.
+
 ## Folder Methods
 
 All the core document operations available on the main Morphik client are also available on folder objects, but they are automatically scoped to the specific folder:
@@ -108,7 +130,7 @@ All the core document operations available on the main Morphik client are also a
 
 ## Managing Existing Documents and Folders
 
-You can move previously ingested documents into a folder, remove them, or delete the entire folder. The SDK methods accept a folder name or UUID.
+You can move previously ingested documents into a folder, remove them, or delete the entire folder. The SDK methods accept a folder UUID, name, or canonical path.
 
 <Tabs>
   <Tab title="Sync">
@@ -120,9 +142,9 @@ You can move previously ingested documents into a folder, remove them, or delete
     
     document_id = "doc_123"
 
-    # Add an existing document to the folder (name or UUID works)
+    # Add an existing document to the folder (name/path or UUID works)
     db.add_document_to_folder(folder.id, document_id)
-    db.add_document_to_folder("marketing_docs", document_id)
+    db.add_document_to_folder("/projects/alpha/specs", document_id)
 
     # Remove the document from the folder
     db.remove_document_from_folder("marketing_docs", document_id)
@@ -140,7 +162,7 @@ You can move previously ingested documents into a folder, remove them, or delete
         document_id = "doc_123"
 
         await db.add_document_to_folder(folder.id, document_id)
-        await db.add_document_to_folder("marketing_docs", document_id)
+        await db.add_document_to_folder("/projects/alpha/specs", document_id)
 
         await db.remove_document_from_folder("marketing_docs", document_id)
 

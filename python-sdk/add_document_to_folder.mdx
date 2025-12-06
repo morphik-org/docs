@@ -24,7 +24,7 @@ description: "Add an existing document to a folder"
 
 ## Parameters
 
-- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+- `folder_id_or_name` (str): Folder identifier. Accepts the folder's UUID, name, or canonical path (e.g., `/projects/alpha/specs`; leading slash optional).
 - `document_id` (str): Identifier of the document to move into the folder.
 
 ## Returns
@@ -42,7 +42,7 @@ description: "Add an existing document to a folder"
     folder = db.get_folder("marketing_docs")
 
     db.add_document_to_folder(folder.id, "doc_123")
-    db.add_document_to_folder("marketing_docs", "doc_456")
+    db.add_document_to_folder("/projects/alpha/specs", "doc_456")
     ```
   </Tab>
   <Tab title="Async">
@@ -53,7 +53,7 @@ description: "Add an existing document to a folder"
         folder = await db.get_folder("marketing_docs")
 
         await db.add_document_to_folder(folder.id, "doc_123")
-        await db.add_document_to_folder("marketing_docs", "doc_456")
+        await db.add_document_to_folder("/projects/alpha/specs", "doc_456")
     ```
   </Tab>
 </Tabs>

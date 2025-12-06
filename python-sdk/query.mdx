@@ -24,6 +24,7 @@ Generate completion using relevant chunks as context.
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         chat_id: Optional[str] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
         llm_config: Optional[Dict[str, Any]] = None,
@@ -47,6 +48,7 @@ Generate completion using relevant chunks as context.
         include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         chat_id: Optional[str] = None,
         schema: Optional[Union[Type[BaseModel], Dict[str, Any]]] = None,
         llm_config: Optional[Dict[str, Any]] = None,
@@ -70,7 +72,8 @@ Generate completion using relevant chunks as context.
 - `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
 - `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
-- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths (e.g., `/projects/alpha/specs`) or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `chat_id` (str, optional): Optional chat session ID for persisting conversation history.
 - `schema` (Type[BaseModel] | Dict[str, Any], optional): Optional schema for structured output, can be a Pydantic model or a JSON schema dict
 - `llm_config` (Dict[str, Any], optional): Optional LiteLLM-compatible model configuration (e.g., model name, API key, base URL). Allows overriding the default LLM configuration on a per-query basis. Defaults to None.
@@ -134,6 +137,13 @@ For more advanced filtering patterns, see the [Complex Metadata Filtering cookbo
         filters={"department": "research"},
         temperature=0.7
     )
+
+    nested = db.query(
+        "List open design questions",
+        folder_name="/projects/alpha",
+        folder_depth=-1,
+        k=6,
+    )
     
     print(response.completion)
     
@@ -151,6 +161,13 @@ For more advanced filtering patterns, see the [Complex Metadata Filtering cookbo
             "What are the key findings about customer satisfaction?",
             filters={"department": "research"},
             temperature=0.7
+        )
+
+        nested = await db.query(
+            "List open design questions",
+            folder_name="/projects/alpha",
+            folder_depth=-1,
+            k=6,
         )
         
         print(response.completion)

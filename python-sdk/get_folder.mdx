@@ -1,6 +1,6 @@
 ---
 title: "get_folder"
-description: "Retrieve a folder by name or UUID"
+description: "Retrieve a folder by name, canonical path, or UUID"
 ---
 
 <Tabs>
@@ -22,11 +22,13 @@ description: "Retrieve a folder by name or UUID"
 
 ## Parameters
 
-- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+- `folder_id_or_name` (str): Folder identifier. Accepts the folder's UUID, name, or canonical path (e.g., `/projects/alpha/specs`; leading slash optional).
 
 ## Returns
 
 - `Folder`: Folder object that can be used to scope operations (ingest, query, etc.).
+
+Folder objects include hierarchy metadata such as `full_path`, `parent_id`, `depth`, and `child_count`, mirroring the server response.
 
 ## Examples
 

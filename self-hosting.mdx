@@ -14,6 +14,34 @@ For users who need to run Morphik on their own infrastructure, we provide two in
         <Accordion title="Python">
           Please ensure that you have Python 3.12 installed on your machine. Guides for installing Python can be found on the [Python website](https://www.python.org/downloads/release/python-3129/).
         </Accordion>
+        <Accordion title="Rust">
+          Morphik requires the Rust toolchain for optimized performance operations (binary quantization, base64 encoding, text processing). Install Rust using rustup:
+
+          <Tabs>
+            <Tab title="macOS/Linux">
+              ```bash
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+              ```
+
+              After installation, restart your terminal or run:
+              ```bash
+              source $HOME/.cargo/env
+              ```
+            </Tab>
+            <Tab title="Windows">
+              Download and run the installer from [rustup.rs](https://rustup.rs/), or use winget:
+              ```powershell
+              winget install Rustlang.Rustup
+              ```
+            </Tab>
+          </Tabs>
+
+          Verify the installation:
+          ```bash
+          rustc --version
+          cargo --version
+          ```
+        </Accordion>
         <Accordion title="PostgreSQL">
           Morphik requires PostgreSQL with the pgvector extension for vector storage and similarity search capabilities. Follow the installation instructions for your operating system:
 

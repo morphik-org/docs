@@ -6,19 +6,29 @@ description: "List all graphs the user has access to"
 <Tabs>
   <Tab title="Sync">
     ```python
-    def list_graphs() -> List[Graph]
+    def list_graphs(
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
+        end_user_id: Optional[str] = None,
+    ) -> List[Graph]
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    async def list_graphs() -> List[Graph]
+    async def list_graphs(
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
+        end_user_id: Optional[str] = None,
+    ) -> List[Graph]
     ```
   </Tab>
 </Tabs>
 
 ## Parameters
 
-None
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
+- `end_user_id` (str, optional): Optional end-user scope.
 
 ## Returns
 
@@ -42,6 +52,9 @@ None
             f"Graph: {graph.name} (status={status}), "
             f"Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}",
         )
+
+    # Scope to a nested folder subtree
+    nested_graphs = db.list_graphs(folder_name="/projects/alpha", folder_depth=-1)
         
     # Find the most recent graph
     latest_graph = max(graphs, key=lambda g: g.updated_at)
@@ -62,6 +75,8 @@ None
                 f"Graph: {graph.name} (status={status}), "
                 f"Entities: {len(graph.entities)}, Relationships: {len(graph.relationships)}",
             )
+
+        nested_graphs = await db.list_graphs(folder_name="/projects/alpha", folder_depth=-1)
         
         # Find the most recent graph
         latest_graph = max(graphs, key=lambda g: g.updated_at)
@@ -84,3 +99,4 @@ Each `Graph` object in the returned list has the following properties:
 - `created_at` (datetime): Creation timestamp
 - `updated_at` (datetime):  Last update timestamp
 - `owner` (Dict[str, str]): Graph owner information
+- `folder_path` (Optional[str]): Canonical folder path for the graph (if scoped)

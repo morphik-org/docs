@@ -8,7 +8,8 @@ description: "Get the current status of a graph with pipeline stage information"
     ```python
     def get_graph_status(
         graph_name: str,
-        folder_name: Optional[str] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
     ) -> Dict[str, Any]
     ```
@@ -17,7 +18,8 @@ description: "Get the current status of a graph with pipeline stage information"
     ```python
     async def get_graph_status(
         graph_name: str,
-        folder_name: Optional[str] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
     ) -> Dict[str, Any]
     ```
@@ -27,7 +29,8 @@ description: "Get the current status of a graph with pipeline stage information"
 ## Parameters
 
 - `graph_name` (str): Name of the graph to check
-- `folder_name` (str, optional): Optional folder name for scoping
+- `folder_name` (str | List[str], optional): Optional folder scope (canonical path or list of paths/names)
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `end_user_id` (str, optional): Optional end user ID for scoping
 
 ## Returns
@@ -53,7 +56,8 @@ description: "Get the current status of a graph with pipeline stage information"
     # Check with folder scoping
     status = db.get_graph_status(
         graph_name="team_graph",
-        folder_name="engineering",
+        folder_name="/engineering/graphs",
+        folder_depth=-1,
     )
     print(f"Graph status in folder: {status.get('status')}")
     ```
@@ -73,7 +77,8 @@ description: "Get the current status of a graph with pipeline stage information"
         # Check with folder scoping
         status = await db.get_graph_status(
             graph_name="team_graph",
-            folder_name="engineering",
+            folder_name="/engineering/graphs",
+            folder_depth=-1,
         )
         print(f"Graph status in folder: {status.get('status')}")
     ```

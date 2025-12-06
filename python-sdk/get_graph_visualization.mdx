@@ -10,6 +10,7 @@ description: "Retrieve nodes and links for visualizing a knowledge graph"
   def get_graph_visualization(
       name: str,
       folder_name: Optional[Union[str, List[str]]] = None,
+      folder_depth: Optional[int] = None,
       end_user_id: Optional[str] = None,
   ) -> Dict[str, Any]
   ```
@@ -21,6 +22,7 @@ description: "Retrieve nodes and links for visualizing a knowledge graph"
   async def get_graph_visualization(
       name: str,
       folder_name: Optional[Union[str, List[str]]] = None,
+      folder_depth: Optional[int] = None,
       end_user_id: Optional[str] = None,
   ) -> Dict[str, Any]
   ```
@@ -31,7 +33,8 @@ description: "Retrieve nodes and links for visualizing a knowledge graph"
 ## Parameters
 
 - `name` (str): Graph name.
-- `folder_name` (str | List[str], optional): Folder scope filter.
+- `folder_name` (str | List[str], optional): Folder scope filter (canonical path or list of paths/names).
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `end_user_id` (str, optional): End-user scope filter.
 
 ## Returns

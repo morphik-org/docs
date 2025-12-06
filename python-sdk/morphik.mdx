@@ -71,6 +71,8 @@ Morphik supports organizing and isolating data by user and folder. This provides
   </Tab>
 </Tabs>
 
+Nested folders are supported across the SDK. Use canonical paths (e.g., `"/projects/alpha/specs"`) when creating or scoping folders, and pass `folder_depth` on retrieval/list/graph helpers to include descendant folders.
+
 For detailed documentation and examples:
 - [Folder Management](/python-sdk/folders) - Organizing documents by logical groups
 - [User Management](/python-sdk/users) - Multi-tenant isolation and user-level data management

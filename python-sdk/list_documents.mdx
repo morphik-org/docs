@@ -16,6 +16,7 @@ description: "List accessible documents in Morphik"
         limit: int = 100,
         filters: Optional[Dict[str, Any]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         include_total_count: bool = False,
         include_status_counts: bool = False,
         include_folder_counts: bool = False,
@@ -32,6 +33,7 @@ description: "List accessible documents in Morphik"
         limit: int = 100,
         filters: Optional[Dict[str, Any]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         include_total_count: bool = False,
         include_status_counts: bool = False,
         include_folder_counts: bool = False,
@@ -48,7 +50,8 @@ description: "List accessible documents in Morphik"
 - `skip` (int, optional): Number of documents to skip for pagination. Defaults to 0.
 - `limit` (int, optional): Maximum number of documents to return. Defaults to 100.
 - `filters` (Dict[str, Any], optional): Metadata filters to apply
-- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a canonical path (e.g., `/projects/alpha`) or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `include_total_count` (bool, optional): Include total count of matching documents. Defaults to False.
 - `include_status_counts` (bool, optional): Include counts grouped by processing status. Defaults to False.
 - `include_folder_counts` (bool, optional): Include counts grouped by folder. Defaults to False.
@@ -165,9 +168,20 @@ response = db.list_documents(filters=filters, include_total_count=True)
         sort_direction="desc",
         filters={"department": "research"}
     )
-    ```
+  ```
   </Tab>
 </Tabs>
+
+### Nested Folder Queries
+
+```python
+# Include all documents under /projects/alpha and its children
+response = db.list_documents(
+    folder_name="/projects/alpha",
+    folder_depth=-1,  # descend through nested folders
+    include_folder_counts=True,
+)
+```
 
 ### Aggregates and Counts
 
@@ -203,4 +217,6 @@ The `Document` objects returned by this method have the following properties:
 - `metadata` (Dict[str, Any]): User-defined metadata
 - `storage_info` (Dict[str, str]): Storage-related information
 - `system_metadata` (Dict[str, Any]): System-managed metadata
-- `chunk_ids` (List[str]): IDs of document chunks 
+- `chunk_ids` (List[str]): IDs of document chunks
+- `folder_name` (Optional[str]): Folder leaf name
+- `folder_path` (Optional[str]): Canonical folder path (includes nested parents)

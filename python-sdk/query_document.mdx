@@ -41,11 +41,11 @@ description: "Run a one-off Morphik On-the-Fly analysis with optional ingestion 
   - `ingest` (bool): Queue the file for ingestion after analysis.
   - `metadata` (dict): Metadata supplied with the request. When `schema` yields a JSON object, those fields are merged into this metadata before ingestion.
   - `use_colpali` (bool): Override the embedding strategy used during ingestion.
-  - `folder_name` (str | list[str]): Folder scope for the queued ingestion.
+  - `folder_name` (str | list[str]): Folder scope for the queued ingestion (canonical path or list of paths/names; nested parents are created automatically).
   - `end_user_id` (str): End-user scope for the queued ingestion.
   Unsupported keys are ignored.
 - `filename` (str, optional): Filename override when uploading bytes or file-like objects.
-- `folder_name` (str | list[str], optional): Folder scope applied to the inline request. Automatically set when calling from folder helpers; merged into `ingestion_options` if not already present.
+- `folder_name` (str | list[str], optional): Folder scope applied to the inline request (canonical path or list of paths/names). Automatically set when calling from folder helpers; merged into `ingestion_options` if not already present.
 - `end_user_id` (str, optional): End-user scope for the inline request. Automatically set when using user scope helpers; merged into `ingestion_options` if not already present.
 
 ### Metadata Filters

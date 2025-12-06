@@ -29,7 +29,7 @@ description: "Retrieve specific chunks by their document ID and chunk number"
 ## Parameters
 
 - `sources` (List[Union[ChunkSource, Dict[str, Any]]]): List of ChunkSource objects or dictionaries with document_id and chunk_number
-- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths or a list of paths/names.
 - `use_colpali` (bool, optional): Whether to request multimodal chunks when available. Defaults to True.
 - `output_format` (str, optional): Controls how image chunks are returned. Set to `"url"` to receive presigned URLs; omit or set to `"base64"` (default) to receive base64 content.
 
