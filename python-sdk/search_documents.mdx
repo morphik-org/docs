@@ -11,6 +11,7 @@ description: "Search for documents by name or filename"
         limit: int = 10,
         filters: Optional[Dict[str, Any]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
     ) -> List[Document]
     ```
@@ -22,6 +23,7 @@ description: "Search for documents by name or filename"
         limit: int = 10,
         filters: Optional[Dict[str, Any]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
     ) -> List[Document]
     ```
@@ -33,7 +35,8 @@ description: "Search for documents by name or filename"
 - `query` (str): Search query for document names/filenames
 - `limit` (int, optional): Maximum number of documents to return. Defaults to 10.
 - `filters` (Dict[str, Any], optional): Optional metadata filters
-- `folder_name` (str | List[str], optional): Optional folder scope (single name or list of names)
+- `folder_name` (str | List[str], optional): Optional folder scope (canonical path or list of paths/names)
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `end_user_id` (str, optional): Optional end-user scope
 
 ## Returns
@@ -79,7 +82,8 @@ docs = db.search_documents("report", filters=filters)
     # Search within specific folders
     docs = db.search_documents(
         query="contract",
-        folder_name=["legal", "hr"],
+        folder_name="/projects/legal",
+        folder_depth=-1,
     )
 
     # Search scoped to an end user
@@ -109,7 +113,8 @@ docs = db.search_documents("report", filters=filters)
         # Search within specific folders
         docs = await db.search_documents(
             query="contract",
-            folder_name=["legal", "hr"],
+            folder_name="/projects/legal",
+            folder_depth=-1,
         )
 
         # Search scoped to an end user
@@ -124,5 +129,5 @@ docs = db.search_documents("report", filters=filters)
 ## Notes
 
 - This method searches document names and filenames, not document content. For content-based search, use [`retrieve_chunks`](./retrieve_chunks) or [`retrieve_docs`](./retrieve_docs).
-- The `folder_name` parameter accepts either a single string or a list of folder names for multi-folder search.
+- The `folder_name` parameter accepts a canonical path (leading slash optional) or a list of paths/names; combine with `folder_depth` to include descendants.
 - Results are returned sorted by relevance to the search query.

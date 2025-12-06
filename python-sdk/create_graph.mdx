@@ -11,6 +11,8 @@ description: "Create a graph from documents"
         filters: Optional[Dict[str, Any]] = None,
         documents: Optional[List[str]] = None,
         prompt_overrides: Optional[Union[GraphPromptOverrides, Dict[str, Any]]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
     ) -> Graph
     ```
   </Tab>
@@ -21,6 +23,8 @@ description: "Create a graph from documents"
         filters: Optional[Dict[str, Any]] = None,
         documents: Optional[List[str]] = None,
         prompt_overrides: Optional[Union[GraphPromptOverrides, Dict[str, Any]]] = None,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        end_user_id: Optional[str] = None,
     ) -> Graph
     ```
   </Tab>
@@ -32,6 +36,8 @@ description: "Create a graph from documents"
 - `filters` (Dict[str, Any], optional): Optional metadata filters to determine which documents to include
 - `documents` (List[str], optional): Optional list of specific document IDs to include
 - `prompt_overrides` (GraphPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction and resolution prompts
+- `folder_name` (str | List[str], optional): Optional folder scope (canonical path or list of paths/names)
+- `end_user_id` (str, optional): Optional end-user scope
 
 ## Returns
 
@@ -57,6 +63,7 @@ graph is done, or poll `graph.is_processing` / `graph.is_completed`.
     graph = db.create_graph(
         name="research_graph",
         filters={"category": "research"},
+        folder_name="/projects/alpha",
     )
 
     # Option 1: Block until finished
@@ -127,6 +134,7 @@ graph is done, or poll `graph.is_processing` / `graph.is_completed`.
         graph = await db.create_graph(
             name="research_graph",
             filters={"category": "research"},
+            folder_name="/projects/alpha",
         )
 
         # Wait for completion
@@ -206,3 +214,4 @@ The returned `Graph` object has the following properties:
 - `created_at` (datetime): Creation timestamp
 - `updated_at` (datetime): Last update timestamp
 - `owner` (Dict[str, str]): Graph owner information
+- `folder_path` (Optional[str]): Canonical folder path for the graph (if scoped)

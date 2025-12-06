@@ -24,7 +24,7 @@ description: "Remove a document from a folder"
 
 ## Parameters
 
-- `folder_id_or_name` (str): Folder identifier. Accepts either the folder's UUID or its name.
+- `folder_id_or_name` (str): Folder identifier. Accepts the folder's UUID, name, or canonical path (e.g., `/projects/alpha/specs`; leading slash optional).
 - `document_id` (str): Identifier of the document to remove.
 
 ## Returns
@@ -42,7 +42,7 @@ description: "Remove a document from a folder"
     folder = db.get_folder("marketing_docs")
 
     db.remove_document_from_folder(folder.id, "doc_123")
-    db.remove_document_from_folder("marketing_docs", "doc_456")
+    db.remove_document_from_folder("/projects/alpha/specs", "doc_456")
     ```
   </Tab>
   <Tab title="Async">
@@ -53,7 +53,7 @@ description: "Remove a document from a folder"
         folder = await db.get_folder("marketing_docs")
 
         await db.remove_document_from_folder(folder.id, "doc_123")
-        await db.remove_document_from_folder("marketing_docs", "doc_456")
+        await db.remove_document_from_folder("/projects/alpha/specs", "doc_456")
     ```
   </Tab>
 </Tabs>

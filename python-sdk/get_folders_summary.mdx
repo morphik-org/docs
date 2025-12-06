@@ -78,6 +78,9 @@ The `FolderSummary` objects have the following properties:
 
 - `id` (str): Unique folder identifier
 - `name` (str): Folder name
+- `full_path` (str | None): Canonical folder path (e.g., `/projects/alpha/specs`)
+- `parent_id` (str | None): Parent folder ID
+- `depth` (int | None): Depth in the hierarchy (root = 1)
 - `description` (str | None): Folder description
 - `doc_count` (int): Number of documents in the folder
 - `updated_at` (str | None): Last update timestamp

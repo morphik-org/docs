@@ -9,6 +9,8 @@ description: "Create a new folder for organizing documents"
     def create_folder(
         name: str,
         description: Optional[str] = None,
+        full_path: Optional[str] = None,
+        parent_id: Optional[str] = None,
     ) -> Folder
     ```
   </Tab>
@@ -17,6 +19,8 @@ description: "Create a new folder for organizing documents"
     async def create_folder(
         name: str,
         description: Optional[str] = None,
+        full_path: Optional[str] = None,
+        parent_id: Optional[str] = None,
     ) -> Folder
     ```
   </Tab>
@@ -24,10 +28,10 @@ description: "Create a new folder for organizing documents"
 
 ## Parameters
 
-- `name` (str): Folder name. Must be unique per app and cannot contain `/`.
+- `name` (str): Folder name (leaf segment when using nested paths). If `full_path` is omitted, this becomes the canonical path.
 - `description` (str, optional): Optional description of the folder.
-
-> ⚠️ Nested folders are not supported. Use underscores (`_`) to mimic hierarchy (e.g., `team_reports_q1`).
+- `full_path` (str, optional): Canonical folder path (e.g., `"/projects/alpha/specs"`). Leading slash is optional; parents are created automatically.
+- `parent_id` (str, optional): Explicit parent folder ID. Usually not needed—`full_path` handles hierarchy creation.
 
 ## Returns
 
@@ -39,9 +43,17 @@ description: "Create a new folder for organizing documents"
   <Tab title="Sync">
     ```python
     from morphik import Morphik
-
+    
     db = Morphik()
     folder = db.create_folder("marketing_docs", description="All marketing collateral")
+
+    # Create a nested folder (parents auto-created)
+    nested = db.create_folder(
+        name="specs",
+        full_path="/projects/alpha/specs",
+        description="All project specs",
+    )
+    print(nested.full_path)  # "/projects/alpha/specs"
     ```
   </Tab>
   <Tab title="Async">
@@ -50,6 +62,13 @@ description: "Create a new folder for organizing documents"
 
     async with AsyncMorphik() as db:
         folder = await db.create_folder("marketing_docs", description="All marketing collateral")
+
+        nested = await db.create_folder(
+            name="specs",
+            full_path="/projects/alpha/specs",
+            description="All project specs",
+        )
+        print(nested.full_path)  # "/projects/alpha/specs"
     ```
   </Tab>
 </Tabs>

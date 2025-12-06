@@ -14,6 +14,7 @@ description: "Retrieve relevant documents from Morphik"
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
     ) -> List[DocumentResult]
     ```
   </Tab>
@@ -27,6 +28,7 @@ description: "Retrieve relevant documents from Morphik"
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
     ) -> List[DocumentResult]
     ```
   </Tab>
@@ -40,7 +42,8 @@ description: "Retrieve relevant documents from Morphik"
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to retrieve the documents (only works for documents ingested with `use_colpali=True`). Defaults to True.
 - `use_reranking` (bool, optional): Override workspace reranking configuration for this request.
-- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths (e.g., `/projects/alpha/specs`) or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 
 ## Metadata Filters
 
@@ -76,6 +79,12 @@ docs = db.retrieve_docs("budget summary", filters=filters, k=5)
         k=5,
         min_score=0.5
     )
+
+    nested_docs = db.retrieve_docs(
+        "design notes",
+        folder_name="/projects/alpha",
+        folder_depth=-1,
+    )
     
     for doc in docs:
         print(f"Score: {doc.score}")
@@ -94,6 +103,12 @@ docs = db.retrieve_docs("budget summary", filters=filters, k=5)
             "machine learning",
             k=5,
             min_score=0.5
+        )
+
+        nested_docs = await db.retrieve_docs(
+            "design notes",
+            folder_name="/projects/alpha",
+            folder_depth=-1,
         )
         
         for doc in docs:

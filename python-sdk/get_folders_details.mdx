@@ -40,7 +40,7 @@ description: "Get detailed information about folders with optional document stat
 
 ## Parameters
 
-- `identifiers` (List[str], optional): List of folder IDs or names. If None, returns all accessible folders.
+- `identifiers` (List[str], optional): List of folder IDs, names, or canonical paths (e.g., `/projects/alpha/specs`). If None, returns all accessible folders.
 - `include_document_count` (bool, optional): Include total document count. Defaults to True.
 - `include_status_counts` (bool, optional): Include document counts grouped by processing status. Defaults to False.
 - `include_documents` (bool, optional): Include paginated document list. Defaults to False.
@@ -79,7 +79,7 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
 
     # Get specific folders with status counts
     response = db.get_folders_details(
-        identifiers=["reports", "invoices"],
+        identifiers=["/projects/reports", "invoices"],
         include_status_counts=True,
     )
     for folder_detail in response.folders:
@@ -175,6 +175,8 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
 
 - `folder` (FolderInfo): Folder information
 - `document_info` (FolderDocumentInfo | None): Document statistics and list
+
+`FolderInfo` includes hierarchy fields: `full_path`, `parent_id`, `depth`, and `child_count`, plus description/name metadata.
 
 ### FolderDocumentInfo
 

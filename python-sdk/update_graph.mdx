@@ -16,7 +16,9 @@ description: "Update an existing knowledge graph with new documents"
     updated_graph = db.update_graph(
         name="research_graph",
         additional_filters={"category": "new_research"},
-        additional_documents=["doc_123", "doc_456"]
+        additional_documents=["doc_123", "doc_456"],
+        folder_name="/projects/alpha",
+        folder_depth=-1,
     )
     
     print(f"Graph now has {len(updated_graph.entities)} entities")
@@ -33,7 +35,9 @@ description: "Update an existing knowledge graph with new documents"
         updated_graph = await db.update_graph(
             name="research_graph",
             additional_filters={"category": "new_research"},
-            additional_documents=["doc_123", "doc_456"]
+            additional_documents=["doc_123", "doc_456"],
+            folder_name="/projects/alpha",
+            folder_depth=-1,
         )
         
         print(f"Graph now has {len(updated_graph.entities)} entities")
@@ -48,6 +52,9 @@ description: "Update an existing knowledge graph with new documents"
 - `additional_filters` (Dict[str, Any], optional): Optional additional metadata filters to determine which new documents to include
 - `additional_documents` (List[str], optional): Optional list of additional document IDs to include
 - `prompt_overrides` (GraphPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction and resolution prompts
+- `folder_name` (str | List[str], optional): Optional folder scope (canonical path or list of paths/names)
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
+- `end_user_id` (str, optional): Optional end-user scope
 
 ## Returns
 

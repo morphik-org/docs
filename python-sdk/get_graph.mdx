@@ -6,12 +6,22 @@ description: "Get a graph by name"
 <Tabs>
   <Tab title="Sync">
     ```python
-    def get_graph(name: str) -> Graph
+    def get_graph(
+        name: str,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
+        end_user_id: Optional[str] = None,
+    ) -> Graph
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    async def get_graph(name: str) -> Graph
+    async def get_graph(
+        name: str,
+        folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
+        end_user_id: Optional[str] = None,
+    ) -> Graph
     ```
   </Tab>
 </Tabs>
@@ -19,6 +29,9 @@ description: "Get a graph by name"
 ## Parameters
 
 - `name` (str): Name of the graph to retrieve
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
+- `end_user_id` (str, optional): Optional end-user scope.
 
 ## Returns
 
@@ -38,6 +51,9 @@ description: "Get a graph by name"
     
     # Get a graph by name
     graph = db.get_graph("finance_graph")
+
+    # Or fetch by path and include nested folders
+    nested_graph = db.get_graph("finance_graph", folder_name="/projects/alpha", folder_depth=-1)
     
     if graph.is_processing:
         print("Graph still processing, waiting...")
@@ -64,6 +80,12 @@ description: "Get a graph by name"
     async with AsyncMorphik() as db:
         # Get a graph by name
         graph = await db.get_graph("finance_graph")
+
+        nested_graph = await db.get_graph(
+            "finance_graph",
+            folder_name="/projects/alpha",
+            folder_depth=-1,
+        )
         
         if graph.is_processing:
             print("Graph still processing, waiting...")
@@ -99,6 +121,7 @@ The returned `Graph` object has the following properties:
 - `created_at` (datetime):  Creation timestamp
 - `updated_at` (datetime): Last update timestamp
 - `owner` (Dict[str, str]): Graph owner information
+- `folder_path` (Optional[str]): Canonical folder path for the graph (if scoped)
 
 ### Entity Properties
 

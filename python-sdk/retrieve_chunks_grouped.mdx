@@ -14,6 +14,7 @@ description: "Retrieve relevant chunks with grouping for UI display"
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
@@ -34,6 +35,7 @@ description: "Retrieve relevant chunks with grouping for UI display"
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
+        folder_depth: Optional[int] = None,
         end_user_id: Optional[str] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
@@ -54,7 +56,8 @@ description: "Retrieve relevant chunks with grouping for UI display"
 - `min_score` (float, optional): Minimum similarity threshold. Defaults to 0.0.
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model. Defaults to True.
 - `use_reranking` (bool, optional): Override workspace reranking configuration for this request.
-- `folder_name` (str | List[str], optional): Optional folder scope (single name or list of names)
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths (e.g., `/projects/alpha/specs`) or a list of paths/names.
+- `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
 - `end_user_id` (str, optional): Optional end-user scope
 - `padding` (int, optional): Number of additional chunks/pages to retrieve before and after matched chunks. Defaults to 0.
 - `output_format` (str, optional): Controls how image chunks are returned:
@@ -108,7 +111,8 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
         query="quarterly results",
         k=3,
         padding=2,  # Get 2 chunks before/after each match
-        folder_name="reports",
+        folder_name="/projects/reports",
+        folder_depth=-1,
     )
 
     # With knowledge graph enhancement
@@ -150,7 +154,8 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
             query="quarterly results",
             k=3,
             padding=2,  # Get 2 chunks before/after each match
-            folder_name="reports",
+            folder_name="/projects/reports",
+            folder_depth=-1,
         )
 
         # With knowledge graph enhancement

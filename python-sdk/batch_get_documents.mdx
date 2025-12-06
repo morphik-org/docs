@@ -25,7 +25,7 @@ description: "Retrieve multiple documents by their IDs in a single batch operati
 ## Parameters
 
 - `document_ids` (List[str]): List of document IDs to retrieve
-- `folder_name` (str | List[str], optional): Optional folder scope. Accepts a single folder name or a list of folder names.
+- `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths or a list of paths/names.
 
 ## Returns
 
@@ -67,4 +67,5 @@ Each `Document` object in the returned list has the following properties:
 - `metadata` (Dict[str, Any]): User-defined metadata
 - `storage_info` (Dict[str, str]): Storage-related information
 - `system_metadata` (Dict[str, Any]): System-managed metadata
-- `chunk_ids` (List[str]): IDs of document chunks 
+- `chunk_ids` (List[str]): IDs of document chunks
+- `folder_path` (Optional[str]): Canonical folder path (includes nested parents when scoped)
