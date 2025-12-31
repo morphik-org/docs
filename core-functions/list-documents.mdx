@@ -1,0 +1,120 @@
+---
+title: "List Documents"
+description: "List and filter documents in your Morphik database"
+---
+
+Retrieve a list of documents with optional filtering, sorting, and pagination.
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik("your-uri")
+
+    response = db.list_documents(
+        skip=0,
+        limit=10,
+        filters={"department": {"$eq": "sales"}},
+        sort_by="created_at",
+        sort_direction="desc",
+        include_total_count=True,
+        include_status_counts=True,
+        completed_only=False
+    )
+
+    for doc in response.documents:
+        print(f"{doc.filename}: {doc.external_id}")
+
+    print(f"Total: {response.total_count}")
+
+    if response.has_more:
+        next_page = db.list_documents(skip=response.next_skip, limit=10)
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    import Morphik from 'morphik';
+
+    // For Teams/Enterprise, use your dedicated host: https://companyname-api.morphik.ai
+    const client = new Morphik({
+      apiKey: process.env.MORPHIK_API_KEY,
+      baseURL: 'https://api.morphik.ai'
+    });
+
+    const response = await client.documents.listDocs({
+      skip: 0,
+      limit: 10,
+      document_filters: { department: { $eq: 'sales' } },
+      sort_by: 'created_at',
+      sort_direction: 'desc',
+      include_total_count: true,
+      include_status_counts: true,
+      completed_only: false
+    });
+
+    response.documents?.forEach(doc => {
+      console.log(`${doc.filename}: ${doc.external_id}`);
+    });
+
+    console.log(`Total: ${response.total_count}`);
+
+    if (response.has_more) {
+      const nextPage = await client.documents.listDocs({
+        skip: response.next_skip,
+        limit: 10
+      });
+    }
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST "https://api.morphik.ai/documents/list_docs" \
+      -H "Authorization: Bearer $MORPHIK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "skip": 0,
+        "limit": 10,
+        "document_filters": {"department": {"$eq": "sales"}},
+        "sort_by": "created_at",
+        "sort_direction": "desc",
+        "include_total_count": true,
+        "include_status_counts": true,
+        "completed_only": false
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+For advanced filtering with operators like `$and`, `$or`, `$gte`, `$in`, see [Metadata Filtering](/concepts/metadata-filtering).
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `skip` | int | `0` | Number of documents to skip (pagination) |
+| `limit` | int | `100` | Maximum documents to return |
+| `filters` | object | `null` | Metadata filters (see [Metadata Filtering](/concepts/metadata-filtering)) |
+| `sort_by` | string | `"updated_at"` | Sort field: `created_at`, `updated_at`, `filename`, `external_id` |
+| `sort_direction` | string | `"desc"` | Sort direction: `asc` or `desc` |
+| `completed_only` | boolean | `false` | Only return fully processed documents |
+| `include_total_count` | boolean | `false` | Include total count in response |
+
+## Response
+
+```json
+{
+  "documents": [
+    {
+      "external_id": "doc_abc123",
+      "filename": "report.pdf",
+      "content_type": "application/pdf",
+      "metadata": { "department": "sales" }
+    }
+  ],
+  "returned_count": 10,
+  "total_count": 42,
+  "has_more": true,
+  "next_skip": 10
+}
+```

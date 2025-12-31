@@ -1,0 +1,108 @@
+---
+title: "Retrieve Chunks"
+description: "Search and retrieve relevant chunks from your documents"
+---
+
+Search your documents and retrieve the most relevant chunks based on a natural language query.
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik("your-uri")
+
+    chunks = db.retrieve_chunks(
+        query="What are the quarterly results?",
+        filters={"department": {"$eq": "sales"}},
+        k=5,
+        min_score=0.0,
+        use_colpali=True,
+        folder_name="/reports",
+        padding=1,
+        output_format="url"
+    )
+
+    for chunk in chunks:
+        print(f"Score: {chunk.score:.2f}")
+        print(f"Content: {chunk.content[:200]}...")
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    import Morphik from 'morphik';
+
+    // For Teams/Enterprise, use your dedicated host: https://companyname-api.morphik.ai
+    const client = new Morphik({
+      apiKey: process.env.MORPHIK_API_KEY,
+      baseURL: 'https://api.morphik.ai'
+    });
+
+    const chunks = await client.retrieve.chunks.create({
+      query: 'What are the quarterly results?',
+      filters: { department: { $eq: 'sales' } },
+      k: 5,
+      min_score: 0.0,
+      use_colpali: true,
+      folder_name: '/reports',
+      padding: 1,
+      output_format: 'url'
+    });
+
+    chunks.forEach(chunk => {
+      console.log(`Score: ${chunk.score.toFixed(2)}`);
+      console.log(`Content: ${chunk.content.slice(0, 200)}...`);
+    });
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST "https://api.morphik.ai/retrieve/chunks" \
+      -H "Authorization: Bearer $MORPHIK_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "query": "What are the quarterly results?",
+        "filters": {"department": {"$eq": "sales"}},
+        "k": 5,
+        "min_score": 0.0,
+        "use_colpali": true,
+        "folder_name": "/reports",
+        "padding": 1,
+        "output_format": "url"
+      }'
+    ```
+  </Tab>
+</Tabs>
+
+For advanced filtering with operators like `$and`, `$or`, `$gte`, `$in`, see [Metadata Filtering](/concepts/metadata-filtering).
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `query` | string | required | Natural language search query |
+| `k` | int | `4` | Maximum number of chunks to return |
+| `min_score` | float | `0.0` | Minimum similarity score threshold |
+| `use_colpali` | boolean | `true` | Use Morphik multimodal embeddings (better for images/tables) |
+| `filters` | object | `null` | Metadata filters (see [Metadata Filtering](/concepts/metadata-filtering)) |
+| `padding` | int | `0` | Extra pages to include before/after matches (multimodal only) |
+| `output_format` | string | `"base64"` | Image format: `base64`, `url`, or `text` |
+
+## Response
+
+```json
+[
+  {
+    "document_id": "doc_abc123",
+    "chunk_number": 3,
+    "content": "Q4 revenue increased by 15% year-over-year...",
+    "score": 0.89,
+    "metadata": { "department": "sales" },
+    "filename": "quarterly_report.pdf"
+  }
+]
+```
+
+<Note>
+Use `use_colpali=true` for documents with images, charts, or tables. Morphik multimodal embeddings provide significantly better retrieval accuracy for visual content.
+</Note>

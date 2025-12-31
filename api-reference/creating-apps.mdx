@@ -1,0 +1,76 @@
+---
+title: 'Creating Apps'
+description: 'Provision isolated Morphik apps and generate connection URIs.'
+---
+
+Morphik apps are isolated data environments. Each app has its own documents, embeddings, and auth token, so data stays separated even when apps live on the same cluster. Think of an app as a separate Morphik instance with a shared control plane.
+
+Common uses:
+- Create one app per customer or tenant to keep data segregated.
+- Split environments (prod, staging, sandbox) without running multiple clusters.
+- Separate projects with different data retention or access policies.
+
+## Create a new app (cloud)
+
+**POST** `/cloud/generate_uri`
+
+This endpoint creates an app and returns a Morphik URI that clients use to connect to it.
+
+### Authentication
+
+Provide a Bearer token in `Authorization: Bearer <JWT>`.
+Use an existing Morphik API token to create apps and mint new URIs programmatically.
+
+### Request Body
+
+<Properties>
+  <Property name="app_id" type="string">
+    Optional client-generated app id (recommended: UUID). If omitted, the server generates one.
+  </Property>
+  <Property name="name" type="string" required={true}>
+    Human-friendly app name. Used in the Morphik URI.
+  </Property>
+  <Property name="expiry_days" type="integer">
+    Days until the token expires (default: 3650).
+  </Property>
+</Properties>
+
+### Example request
+
+```bash
+curl -X POST \
+  https://api.morphik.ai/cloud/generate_uri \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "customer-acme"
+  }'
+```
+
+### Response
+
+<Properties>
+  <Property name="uri" type="string">
+    Connection URI in the format `morphik://name:token@host`.
+  </Property>
+  <Property name="app_id" type="string">
+    The app id associated with the URI.
+  </Property>
+</Properties>
+
+**Example response:**
+
+```json
+{
+  "uri": "morphik://customer-acme:eyJhbGciOi...@api.morphik.ai",
+  "app_id": "f5c5e51a-7a1b-4c8d-8d7e-3c5ed3c6c7b2"
+}
+```
+
+### Notes
+
+- The response always contains a newly minted token for the app.
+- If `app_id` is omitted, the server generates one.
+- `name` is required.
+- App names must be unique per owner or org; duplicates return 409.
+- If the account tier has reached its app limit, the API returns 403.
