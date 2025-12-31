@@ -70,7 +70,7 @@ For users who need to run Morphik on their own infrastructure, we provide two in
               These commands create a database named "morphik" and a superuser named "postgres" that the application will use to connect.
             </Tab>
             <Tab title="Ubuntu/Debian">
-              Install PostgreSQL from the official repositories.**We recommend version 14** . Other versions may work, but haven't been extensively tested\!
+              Install PostgreSQL from the official repositories. **We recommend version 14.** Other versions may work, but haven't been extensively tested!
 
               ```bash
               sudo apt update
@@ -337,9 +337,9 @@ For users who need to run Morphik on their own infrastructure, we provide two in
 
     During installation, you'll be prompted:
     1. To enter your OpenAI API key (optional - press Enter to skip and configure later)
-    2. To set a LOCAL_URI_TOKEN for authentication:
-       - **Skip for local-only access**: Press Enter to enable development mode (`dev_mode=true`)
-       - **Set for production/external access**: Enter a secure token to enable authentication (`dev_mode=false`)
+    2. To set a LOCAL_URI_PASSWORD for authentication:
+       - **Skip for local-only access**: Press Enter to enable auth bypass (`bypass_auth_mode=true`)
+       - **Set for production/external access**: Enter a secure password to keep authentication enabled (`bypass_auth_mode=false`)
     3. Whether you'd like to install the Admin UI (recommended for easier management)
 
     <Note>
@@ -384,15 +384,14 @@ For users who need to run Morphik on their own infrastructure, we provide two in
 
     Morphik provides flexible authentication options:
 
-    **Development Mode (Local Access Only)**
-    - If you skipped setting a LOCAL_URI_TOKEN during installation, Morphik runs in `dev_mode=true`
-    - No authentication required for local API access
-    - Perfect for local development and testing
+    **Local Development (bypass_auth_mode = true)**
+    - When `bypass_auth_mode = true`, authentication is disabled for local API access
+    - Useful for local development and testing
     - **Not secure for production or external access**
 
-    **Production Mode (Secure External Access)**
-    - If you set a LOCAL_URI_TOKEN during installation, Morphik runs in `dev_mode=false`
+    **Authenticated Mode (bypass_auth_mode = false)**
     - Authentication required for all API requests
+    - Set `JWT_SECRET_KEY` and `LOCAL_URI_PASSWORD` in your environment
     - To generate authorized connection URIs:
 
     <Steps>
@@ -401,8 +400,8 @@ For users who need to run Morphik on their own infrastructure, we provide two in
         
         ![Generate Local URI endpoint in Swagger UI](/assets/generate_local_uri_api_docs.png)
       </Step>
-      <Step title="Find the /generate_local_uri endpoint">
-        Scroll down to find the `/generate_local_uri` endpoint in the Management API section
+      <Step title="Find the /local/generate_uri endpoint">
+        Scroll down to find the `/local/generate_uri` endpoint in the API docs
       </Step>
       <Step title="Generate your connection URI">
         1. Click on the endpoint to expand it
@@ -410,7 +409,7 @@ For users who need to run Morphik on their own infrastructure, we provide two in
         3. Fill in the request parameters:
            - **name**: A descriptive name for this connection (e.g., "admin")
            - **expiry_days**: How long the token should remain valid (default: 30)
-           - **password_token**: Your LOCAL_URI_TOKEN from installation
+           - **password_token**: Your LOCAL_URI_PASSWORD from your environment
            - **server_mode**: 
              - Set to `true` if you want to access Morphik from outside the server
              - Set to `false` for local access only (uses localhost)

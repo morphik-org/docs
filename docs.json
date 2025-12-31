@@ -53,13 +53,23 @@
             "group": "Get Started",
             "pages": [
               "introduction",
-              "getting-started"
+              "getting-started",
+              "concepts/naive-rag"
+            ]
+          },
+          {
+            "group": "Core Functions",
+            "pages": [
+              "core-functions/ingest-file",
+              "core-functions/list-documents",
+              "core-functions/retrieve-chunks",
+              "core-functions/delete-document",
+              "core-functions/batch-get-chunks"
             ]
           },
           {
             "group": "Concepts",
             "pages": [
-              "concepts/naive-rag",
               "concepts/user-folder-scoping",
               "concepts/colpali",
               "concepts/knowledge-graphs",
@@ -86,9 +96,9 @@
             ]
           },
           {
-            "group": "Instance Management",
+            "group": "Creating Apps",
             "pages": [
-              "api-reference/management-api"
+              "api-reference/creating-apps"
             ]
           },
           {
@@ -152,13 +162,7 @@
               "python-sdk/query_document"
             ]
           },
-          {
-            "group": "Migration Guides",
-            "pages": [
-              "python-sdk/migration-v1"
-            ]
-          },
-          {
+                    {
             "group": "Document Retrieval",
             "pages": [
               "python-sdk/retrieve_chunks",
@@ -275,7 +279,7 @@
       },
       {
         "label": "Community",
-        "href": "https://discord.gg/H7RN3XdGu3"
+        "href": "https://discord.com/invite/BwMtv3Zaju"
       },
       {
         "label": "GitHub",

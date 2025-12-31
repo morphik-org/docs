@@ -1,0 +1,117 @@
+---
+title: "Ingest File"
+description: "Upload and process a file into Morphik"
+---
+
+Upload a file to Morphik for processing. The file is stored and a background worker handles parsing and chunking.
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik("your-uri")
+
+    doc = db.ingest_file(
+        file="report.pdf",
+        filename="Q4_Report.pdf",
+        metadata={"department": "sales", "year": 2025, "quarter": "Q4"},
+        use_colpali=True
+    )
+
+    doc.wait_for_completion()
+    print(f"Document ID: {doc.external_id}")
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    import Morphik from 'morphik';
+    import fs from 'fs';
+
+    // For Teams/Enterprise, use your dedicated host: https://companyname-api.morphik.ai
+    const client = new Morphik({
+      apiKey: process.env.MORPHIK_API_KEY,
+      baseURL: 'https://api.morphik.ai'
+    });
+
+    const doc = await client.ingest.ingestFile({
+      file: fs.createReadStream('report.pdf'),
+      metadata: JSON.stringify({ department: 'sales', year: 2025, quarter: 'Q4' }),
+      use_colpali: true,
+      folder_name: '/reports/quarterly'
+    });
+
+    console.log(`Document ID: ${doc.external_id}`);
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    curl -X POST "https://api.morphik.ai/ingest/file" \
+      -H "Authorization: Bearer $MORPHIK_API_KEY" \
+      -F "file=@report.pdf" \
+      -F 'metadata={"department": "sales", "year": 2025, "quarter": "Q4"}' \
+      -F "use_colpali=true" \
+      -F "folder_name=/reports/quarterly"
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `file` | file | required | The file to upload |
+| `filename` | string | `null` | Override filename (optional) |
+| `metadata` | object | `{}` | Custom metadata to attach to the document |
+| `use_colpali` | boolean | `true` | Use Morphik multimodal embeddings for better image/table retrieval |
+| `folder_name` | string | `null` | Target folder path for organization |
+
+## Supported File Types
+
+| Category | Extensions |
+|----------|------------|
+| **Documents** | `.pdf` |
+| **Word** | `.docx`, `.doc` |
+| **PowerPoint** | `.pptx`, `.ppt`, `.ppsx` |
+| **Excel** | `.xlsx`, `.xls`, `.xlsm` |
+| **Images** | `.jpg`, `.png`, `.gif`, `.webp`, `.tiff`, `.bmp`, `.svg` |
+| **Video** | `.mp4`, `.mpeg`, `.mov`, `.avi`, `.webm`, `.mkv`, `.3gp` |
+| **Text** | `.txt`, `.md`, `.rst`, `.log` |
+| **Data** | `.json`, `.csv`, `.tsv`, `.yaml`, `.xml` |
+| **Web** | `.html`, `.htm` |
+
+## Response
+
+```json
+{
+  "external_id": "doc_abc123",
+  "filename": "report.pdf",
+  "content_type": "application/pdf",
+  "metadata": { "department": "sales", "year": 2025 },
+  "system_metadata": { "status": "processing" }
+}
+```
+
+## Waiting for Processing
+
+Documents are processed asynchronously. Use these methods to wait for completion:
+
+<Tabs>
+  <Tab title="Python">
+    ```python
+    doc.wait_for_completion()
+    ```
+  </Tab>
+  <Tab title="TypeScript">
+    ```typescript
+    const status = await client.documents.getStatus(doc.external_id);
+    // status.status will be "processing", "completed", or "failed"
+    ```
+  </Tab>
+  <Tab title="cURL">
+    ```bash
+    curl -X GET "https://api.morphik.ai/documents/{document_id}/status" \
+      -H "Authorization: Bearer $MORPHIK_API_KEY"
+    ```
+  </Tab>
+</Tabs>
