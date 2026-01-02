@@ -71,6 +71,7 @@
             "group": "Concepts",
             "pages": [
               "concepts/user-folder-scoping",
+              "concepts/cloud-architecture",
               "concepts/colpali",
               "concepts/knowledge-graphs",
               "concepts/metadata-filtering"
