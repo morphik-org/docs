@@ -5,7 +5,7 @@ description: 'Using Late-interaction and Contrastive learning to achieve state-o
 
 ## Introduction
 
-Upto now, we've seen RAG techniques that **i)** parse a given document, **ii)** convert it to text, and **iii)** embed the text for retrieval. These techniques have been particularly text-heavy. Embedding models expect text in, knowledge graphs expect text in, and parsers break down when provided with documents that aren't text-dominant. This motivates the question:
+Upto now, we've seen RAG techniques that **i)** parse a given document, **ii)** convert it to text, and **iii)** embed the text for retrieval. These techniques have been particularly text-heavy. Embedding models expect text in, and parsers break down when provided with documents that aren't text-dominant. This motivates the question:
 
 > When was the last time you looked at a document and only saw text?
 
@@ -57,7 +57,7 @@ from morphik import Morphik
 
 db = Morphik("YOUR-URI-HERE")
 
-db.ingest_file("report_with_images_and_graphs.pdf", use_colpali=True)
+db.ingest_file("report_with_images_and_charts.pdf", use_colpali=True)
 ```
 
 Here is an example query pathway:
@@ -100,8 +100,6 @@ The three output formats are:
 <Note>
 If you're experiencing context limit issues with image-based retrieval, it may be because images aren't being passed correctly to the model. See [Generating Completions with Retrieved Chunks](/cookbooks/generating-completions-with-retrieved-chunks) for examples of properly passing images (both base64 and URLs) to vision-capable models like GPT-4o.
 </Note>
-
-
 
 
 

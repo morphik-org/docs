@@ -1,0 +1,52 @@
+---
+title: "get_folder_by_name"
+description: "Create a folder scope from a name or path"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_folder_by_name(
+        name: str,
+    ) -> Folder
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_folder_by_name(
+        name: str,
+    ) -> Folder
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): Folder name or canonical path
+
+## Returns
+
+- `Folder`: Folder scope object for subsequent operations
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder_by_name("/projects/alpha")
+    docs = folder.list_documents()
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder_by_name("/projects/alpha")
+        docs = await folder.list_documents()
+    ```
+  </Tab>
+</Tabs>

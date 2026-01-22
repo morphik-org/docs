@@ -19,9 +19,6 @@ Generate completion using relevant chunks as context.
         temperature: Optional[float] = None,
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
-        graph_name: Optional[str] = None,
-        hop_depth: int = 1,
-        include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
         folder_depth: Optional[int] = None,
@@ -43,9 +40,6 @@ Generate completion using relevant chunks as context.
         temperature: Optional[float] = None,
         use_colpali: bool = True,
         use_reranking: Optional[bool] = None,
-        graph_name: Optional[str] = None,
-        hop_depth: int = 1,
-        include_paths: bool = False,
         prompt_overrides: Optional[Union[QueryPromptOverrides, Dict[str, Any]]] = None,
         folder_name: Optional[Union[str, List[str]]] = None,
         folder_depth: Optional[int] = None,
@@ -68,9 +62,6 @@ Generate completion using relevant chunks as context.
 - `temperature` (float, optional): Model temperature
 - `use_colpali` (bool, optional): Whether to use ColPali-style embedding model to generate the completion (only works for documents ingested with `use_colpali=True`). Defaults to True.
 - `use_reranking` (bool, optional): Override workspace reranking configuration for this request.
-- `graph_name` (str, optional): Optional name of the graph to use for knowledge graph-enhanced retrieval
-- `hop_depth` (int, optional): Number of relationship hops to traverse in the graph (1-3). Defaults to 1.
-- `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `prompt_overrides` (QueryPromptOverrides | Dict[str, Any], optional): Optional customizations for entity extraction, resolution, and query prompts
 - `folder_name` (str | List[str], optional): Optional folder scope. Accepts canonical paths (e.g., `/projects/alpha/specs`) or a list of paths/names.
 - `folder_depth` (int, optional): Folder scope depth. `None`/`0` = exact match, `-1` = include all descendants, `n > 0` = include descendants up to `n` levels deep.
@@ -179,54 +170,6 @@ For more advanced filtering patterns, see the [Complex Metadata Filtering cookbo
   </Tab>
 </Tabs>
 
-### Knowledge Graph Enhanced Query
-
-<Tabs>
-  <Tab title="Sync">
-    ```python
-    from morphik import Morphik
-    
-    db = Morphik()
-    
-    # Use a knowledge graph to enhance the query
-    response = db.query(
-        "How does product X relate to customer segment Y?",
-        graph_name="market_graph",
-        hop_depth=2,
-        include_paths=True
-    )
-    
-    print(response.completion)
-    
-    # If include_paths=True, you can inspect the graph paths
-    if response.metadata and "graph" in response.metadata:
-        for path in response.metadata["graph"]["paths"]:
-            print(" -> ".join(path))
-    ```
-  </Tab>
-  <Tab title="Async">
-    ```python
-    from morphik import AsyncMorphik
-    
-    async with AsyncMorphik() as db:
-        # Knowledge graph enhanced query
-        kg_response = await db.query(
-            "How does product X relate to customer segment Y?",
-            graph_name="market_graph",
-            hop_depth=2,
-            include_paths=True
-        )
-        
-        print(kg_response.completion)
-        
-        # If include_paths=True, you can inspect the graph paths
-        if kg_response.metadata and "graph" in kg_response.metadata:
-            for path in kg_response.metadata["graph"]["paths"]:
-                print(" -> ".join(path))
-    ```
-  </Tab>
-</Tabs>
-
 ### With Custom Prompt Overrides
 
 <Tabs>
@@ -271,7 +214,6 @@ For more advanced filtering patterns, see the [Complex Metadata Filtering cookbo
         # Example with both query and entity extraction customization
         response = await db.query(
             "How does the medication affect diabetes?",
-            graph_name="medical_graph",
             prompt_overrides=QueryPromptOverrides(
                 # Customize how responses are generated
                 query=QueryPromptOverride(
@@ -299,7 +241,7 @@ The `CompletionResponse` object returned by this method has the following proper
 - `completion` (str | Dict[str, Any] | None): The generated completion text or the structured output dictionary.
 - `usage` (Dict[str, int]): Token usage information
 - `sources` (List[ChunkSource]): Sources of chunks used in the completion
-- `metadata` (Dict[str, Any], optional): Additional metadata about the completion. When using a knowledge graph with `include_paths=True`, this contains graph traversal information.
+- `metadata` (Dict[str, Any], optional): Additional metadata about the completion (if provided by the server).
 - `finish_reason` (Optional[str]): Reason the generation finished (e.g., 'stop', 'length')
 
 ### ChunkSource Properties

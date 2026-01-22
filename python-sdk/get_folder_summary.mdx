@@ -1,0 +1,52 @@
+---
+title: "get_folder_summary"
+description: "Fetch the stored summary for a folder"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_folder_summary(
+        folder_id_or_path: str,
+    ) -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_folder_summary(
+        folder_id_or_path: str,
+    ) -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_path` (str): Folder identifier (UUID, name, or canonical path)
+
+## Returns
+
+- `Summary`: Stored summary payload for the folder
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    summary = db.get_folder_summary("/projects/alpha")
+    print(summary.content)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        summary = await db.get_folder_summary("/projects/alpha")
+        print(summary.content)
+    ```
+  </Tab>
+</Tabs>

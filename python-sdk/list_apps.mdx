@@ -1,0 +1,67 @@
+---
+title: "list_apps"
+description: "List cloud apps accessible to the current credentials"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def list_apps(
+        org_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+        app_id_filter: Optional[Union[str, Dict[str, Any], List[Any]]] = None,
+        app_name_filter: Optional[Union[str, Dict[str, Any], List[Any]]] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def list_apps(
+        org_id: Optional[str] = None,
+        user_id: Optional[str] = None,
+        app_id_filter: Optional[Union[str, Dict[str, Any], List[Any]]] = None,
+        app_name_filter: Optional[Union[str, Dict[str, Any], List[Any]]] = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `org_id` (str, optional): Filter by organization ID
+- `user_id` (str, optional): Filter by user ID
+- `app_id_filter` (str | dict | list, optional): JSON filter for app IDs (dict/list will be serialized)
+- `app_name_filter` (str | dict | list, optional): JSON filter for app names (dict/list will be serialized)
+- `limit` (int, optional): Max results per page. Defaults to 100 (clamped to 500).
+- `offset` (int, optional): Pagination offset. Defaults to 0.
+
+## Returns
+
+- `Dict[str, Any]`: API response containing apps and pagination metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    apps = db.list_apps(limit=20)
+    print(apps)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        apps = await db.list_apps(app_name_filter={"$eq": "demo"})
+        print(apps)
+    ```
+  </Tab>
+</Tabs>

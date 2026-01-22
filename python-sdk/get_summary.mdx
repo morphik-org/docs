@@ -1,0 +1,48 @@
+---
+title: "get_summary"
+description: "Fetch the latest summary for a folder scope"
+---
+
+This method is available on `Folder` objects.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_summary() -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_summary() -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `Summary`: Stored summary payload for the folder
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("/projects/alpha")
+    summary = folder.get_summary()
+    print(summary.content)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("/projects/alpha")
+        summary = await folder.get_summary()
+        print(summary.content)
+    ```
+  </Tab>
+</Tabs>

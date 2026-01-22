@@ -1,0 +1,80 @@
+---
+title: "ingest_directory"
+description: "Ingest all files in a directory"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def ingest_directory(
+        directory: Union[str, Path],
+        recursive: bool = False,
+        pattern: str = "*",
+        metadata: Optional[Dict[str, Any]] = None,
+        use_colpali: bool = True,
+        parallel: bool = True,
+    ) -> List[Document]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def ingest_directory(
+        directory: Union[str, Path],
+        recursive: bool = False,
+        pattern: str = "*",
+        metadata: Optional[Dict[str, Any]] = None,
+        use_colpali: bool = True,
+        parallel: bool = True,
+    ) -> List[Document]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `directory` (str | Path): Directory containing files to ingest
+- `recursive` (bool, optional): Whether to recurse into subdirectories. Defaults to False.
+- `pattern` (str, optional): Glob pattern to select files (for example `"*.pdf"`). Defaults to `"*"`.
+- `metadata` (Dict[str, Any], optional): Metadata applied to each ingested file
+- `use_colpali` (bool, optional): Whether to use ColPali-style embedding. Defaults to True.
+- `parallel` (bool, optional): Whether to process files in parallel. Defaults to True.
+
+## Returns
+
+- `List[Document]`: List of ingested document metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from pathlib import Path
+    from morphik import Morphik
+
+    db = Morphik()
+
+    docs = db.ingest_directory(
+        Path("/data/contracts"),
+        recursive=True,
+        pattern="*.pdf",
+        metadata={"category": "contracts"},
+    )
+    print(f"Ingested {len(docs)} documents")
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from pathlib import Path
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        docs = await db.ingest_directory(
+            Path("/data/contracts"),
+            recursive=True,
+            pattern="*.pdf",
+            metadata={"category": "contracts"},
+        )
+        print(f"Ingested {len(docs)} documents")
+    ```
+  </Tab>
+</Tabs>

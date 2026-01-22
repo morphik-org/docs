@@ -1,0 +1,35 @@
+---
+title: "delete_app"
+description: "Delete a cloud app by name"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def delete_app(
+        app_name: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def delete_app(
+        app_name: str,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `app_name` (str): Name of the app to delete
+
+## Returns
+
+- `Dict[str, Any]`: API response with delete status
+
+## Examples
+
+```python
+db.delete_app("staging-app")
+```

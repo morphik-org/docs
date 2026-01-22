@@ -1,0 +1,52 @@
+---
+title: "get_document_summary"
+description: "Fetch the stored summary for a document"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_document_summary(
+        document_id: str,
+    ) -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_document_summary(
+        document_id: str,
+    ) -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document
+
+## Returns
+
+- `Summary`: Stored summary payload for the document
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    summary = db.get_document_summary("doc_123")
+    print(summary.content)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        summary = await db.get_document_summary("doc_123")
+        print(summary.content)
+    ```
+  </Tab>
+</Tabs>

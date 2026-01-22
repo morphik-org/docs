@@ -1,0 +1,56 @@
+---
+title: "signin"
+description: "Create a user scope for end-user isolation"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def signin(
+        end_user_id: str,
+    ) -> UserScope
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def signin(
+        end_user_id: str,
+    ) -> AsyncUserScope
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `end_user_id` (str): End-user identifier to scope all operations
+
+## Returns
+
+- `UserScope` / `AsyncUserScope`: Scoped client that automatically includes `end_user_id`
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    user = db.signin("user_123")
+    docs = user.list_documents()
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        user = db.signin("user_123")
+        docs = await user.list_documents()
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- You can also scope a folder to a user: `folder.signin("user_123")`.

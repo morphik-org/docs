@@ -15,7 +15,7 @@ This separation keeps your application management in the UI while all document d
 | Component | Primary role | Typical hosting |
 | --- | --- | --- |
 | Cloud UI | Auth, orgs, billing, app metadata, dashboards | Vercel (or your web host) |
-| Morphik Core | Ingestion, storage, retrieval, search, graphs, chat | EC2 or Kubernetes |
+| Morphik Core | Ingestion, storage, retrieval, search, chat | EC2 or Kubernetes |
 | Embedding GPU (optional) | Multimodal embeddings (ColPali API mode) | Lambda GPU, on-prem GPU |
 | Postgres + pgvector | Documents, embeddings, app isolation | Neon or any Postgres |
 | Object storage | Raw files and chunk payloads | S3 or local disk |
@@ -102,4 +102,3 @@ Agent mode runs in a server route (Cloud UI) so it can call your LLM provider se
 - The UI calls `/api/agent/chat` on the Cloud UI.
 - The server route calls Morphik Core for retrieval (using the app token).
 - The server route streams the LLM response back to the browser.
-

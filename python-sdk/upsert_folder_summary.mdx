@@ -1,0 +1,67 @@
+---
+title: "upsert_folder_summary"
+description: "Create or update a folder summary"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def upsert_folder_summary(
+        folder_id_or_path: str,
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def upsert_folder_summary(
+        folder_id_or_path: str,
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `folder_id_or_path` (str): Folder identifier (UUID, name, or canonical path)
+- `content` (str): Summary content (markdown or plain text)
+- `versioning` (bool, optional): Create a new version instead of overwriting. Defaults to True.
+- `overwrite_latest` (bool, optional): Overwrite the latest summary when versioning is enabled. Defaults to False.
+
+## Returns
+
+- `Summary`: Updated summary payload
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    summary = db.upsert_folder_summary(
+        folder_id_or_path="/projects/alpha",
+        content="Summary of project alpha documents.",
+    )
+    print(summary.version)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        summary = await db.upsert_folder_summary(
+            folder_id_or_path="/projects/alpha",
+            content="Summary of project alpha documents.",
+        )
+        print(summary.version)
+    ```
+  </Tab>
+</Tabs>

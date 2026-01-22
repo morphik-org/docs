@@ -73,7 +73,6 @@
               "concepts/user-folder-scoping",
               "concepts/cloud-architecture",
               "concepts/colpali",
-              "concepts/knowledge-graphs",
               "concepts/metadata-filtering"
             ]
           },
@@ -134,18 +133,20 @@
         "tab": "Python SDK",
         "groups": [
           {
-            "group": "Client",
-            "pages": [
-              "python-sdk/morphik",
-              "python-sdk/close"
-            ]
-          },
+          "group": "Client",
+          "pages": [
+            "python-sdk/morphik",
+            "python-sdk/signin",
+            "python-sdk/close"
+          ]
+        },
           {
             "group": "Document Ingestion",
             "pages": [
               "python-sdk/ingest_text",
               "python-sdk/ingest_file",
               "python-sdk/ingest_files",
+              "python-sdk/ingest_directory",
               "python-sdk/query_document"
             ]
           },
@@ -169,6 +170,12 @@
             "python-sdk/create_folder",
             "python-sdk/list_folders",
             "python-sdk/get_folder",
+            "python-sdk/get_folder_by_name",
+            "python-sdk/get_info",
+            "python-sdk/get_summary",
+            "python-sdk/upsert_summary",
+            "python-sdk/get_folder_summary",
+            "python-sdk/upsert_folder_summary",
             "python-sdk/get_folders_summary",
             "python-sdk/get_folders_details",
             "python-sdk/add_document_to_folder",
@@ -185,7 +192,9 @@
               "python-sdk/update_document_metadata",
               "python-sdk/update_document_by_filename_with_text",
               "python-sdk/update_document_by_filename_with_file",
-              "python-sdk/update_document_by_filename_metadata"
+              "python-sdk/update_document_by_filename_metadata",
+              "python-sdk/get_document_summary",
+              "python-sdk/upsert_document_summary"
             ]
           },
           {
@@ -193,19 +202,6 @@
             "pages": [
               "python-sdk/batch_get_documents",
               "python-sdk/batch_get_chunks"
-            ]
-          },
-          {
-            "group": "Knowledge Graph Operations",
-            "pages": [
-              "python-sdk/create_graph",
-              "python-sdk/update_graph",
-              "python-sdk/get_graph",
-              "python-sdk/list_graphs",
-              "python-sdk/get_graph_visualization",
-              "python-sdk/get_graph_status",
-              "python-sdk/wait_for_graph_completion",
-              "python-sdk/check_workflow_status"
             ]
           },
           {
@@ -222,15 +218,29 @@
               "python-sdk/extract_document_pages",
               "python-sdk/get_document_download_url",
               "python-sdk/get_document_status",
+              "python-sdk/wait_for_document_completion",
               "python-sdk/delete_document",
               "python-sdk/delete_document_by_filename"
             ]
           },
           {
-            "group": "Usage & Monitoring",
+            "group": "Apps & Tokens",
             "pages": [
-              "python-sdk/get_usage_stats",
-              "python-sdk/get_recent_usage",
+              "python-sdk/list_apps",
+              "python-sdk/create_app",
+              "python-sdk/generate_cloud_uri",
+              "python-sdk/rename_app",
+              "python-sdk/rotate_app_token",
+              "python-sdk/delete_app"
+            ]
+          },
+          {
+            "group": "Ops & Monitoring",
+            "pages": [
+              "python-sdk/requeue_ingestion_jobs",
+              "python-sdk/get_logs",
+              "python-sdk/get_health",
+              "python-sdk/get_app_storage_usage",
               "python-sdk/ping"
             ]
           }

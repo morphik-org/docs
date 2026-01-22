@@ -1,0 +1,41 @@
+---
+title: "rename_app"
+description: "Rename a cloud app by ID or current name"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def rename_app(
+        new_name: str,
+        app_id: Optional[str] = None,
+        app_name: Optional[str] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def rename_app(
+        new_name: str,
+        app_id: Optional[str] = None,
+        app_name: Optional[str] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `new_name` (str): New app name
+- `app_id` (str, optional): App ID to rename
+- `app_name` (str, optional): Current app name to rename
+
+## Returns
+
+- `Dict[str, Any]`: API response with rename status
+
+## Examples
+
+```python
+db.rename_app(new_name="prod-app", app_name="staging-app")
+```

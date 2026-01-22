@@ -7,7 +7,7 @@ description: "Organize and isolate data into logical folder groups in Morphik"
 
 Folders in Morphik provide a way to organize documents into logical groups. This is particularly useful for multi-project environments where you want to maintain separation between different contexts. Documents within a folder are isolated from those in other folders, allowing for clean organization and data separation.  
 
-> ℹ️ All folder APIs accept **folder UUIDs, names, or canonical paths** (e.g., `"/projects/alpha/specs"`). Folder objects expose `full_path`, `parent_id`, `depth`, and `child_count`; documents and graphs expose `folder_path` to mirror server responses.
+> ℹ️ All folder APIs accept **folder UUIDs, names, or canonical paths** (e.g., `"/projects/alpha/specs"`). Folder objects expose `full_path`, `parent_id`, `depth`, and `child_count`; documents expose `folder_path` to mirror server responses.
 
 ## Creating and Accessing Folders
 
@@ -110,6 +110,20 @@ chunks = db.retrieve_chunks(
 
 Folder-scoped helpers inherit the path automatically, so `folder.retrieve_chunks(..., folder_depth=-1)` will include its children.
 
+## Expanding Scope with Additional Folders
+
+Folder-scoped retrieval/list/query helpers accept `additional_folders` to include extra folders in the same request:
+
+```python
+folder = db.get_folder("/projects/alpha")
+
+# Search across /projects/alpha plus shared archives
+results = folder.retrieve_chunks(
+    "design notes",
+    additional_folders=["/shared", "/archive"],
+)
+```
+
 ## Folder Methods
 
 All the core document operations available on the main Morphik client are also available on folder objects, but they are automatically scoped to the specific folder:
@@ -124,8 +138,9 @@ All the core document operations available on the main Morphik client are also a
 - `list_documents` - List all documents in this folder
 - `batch_get_documents` - Get multiple documents by their IDs from this folder
 - `batch_get_chunks` - Get specific chunks by source from this folder
-- `create_graph` - Create a knowledge graph from documents in this folder
-- `update_graph` - Update a knowledge graph with new documents from this folder
+- `get_info` - Fetch the latest folder metadata from the API
+- `get_summary` - Fetch the latest folder summary
+- `upsert_summary` - Create or update the folder summary
 - `delete_document_by_filename` - Delete a document by filename from this folder
 
 ## Managing Existing Documents and Folders
@@ -247,9 +262,6 @@ A common use case for folders is separating different projects. Here's an exampl
     # Query is scoped to just Project B documents
     project_b_response = project_b.query("What are the technical requirements?")
     
-    # Create project-specific knowledge graphs
-    project_a.create_graph("project_a_graph")
-    project_b.create_graph("project_b_graph")
     ```
   </Tab>
   <Tab title="Async">
@@ -277,9 +289,6 @@ A common use case for folders is separating different projects. Here's an exampl
         # Query is scoped to just Project B documents
         project_b_response = await project_b.query("What are the technical requirements?")
         
-        # Create project-specific knowledge graphs
-        await project_a.create_graph("project_a_graph")
-        await project_b.create_graph("project_b_graph")
     ```
   </Tab>
 </Tabs>

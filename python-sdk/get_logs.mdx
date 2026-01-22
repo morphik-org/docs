@@ -1,0 +1,46 @@
+---
+title: "get_logs"
+description: "Fetch recent API log events for the authenticated app"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_logs(
+        limit: int = 100,
+        hours: float = 4.0,
+        op_type: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> List[LogResponse]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_logs(
+        limit: int = 100,
+        hours: float = 4.0,
+        op_type: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> List[LogResponse]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `limit` (int, optional): Maximum number of log entries. Defaults to 100.
+- `hours` (float, optional): Lookback window in hours. Defaults to 4.0.
+- `op_type` (str, optional): Filter by operation type (for example `query`, `ingest`)
+- `status` (str, optional): Filter by status (for example `ok`, `error`)
+
+## Returns
+
+- `List[LogResponse]`: Recent log entries
+
+## Examples
+
+```python
+logs = db.get_logs(limit=20, hours=24)
+for item in logs:
+    print(item.operation_type, item.status, item.timestamp)
+```

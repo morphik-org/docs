@@ -18,9 +18,6 @@ description: "Retrieve relevant chunks with grouping for UI display"
         end_user_id: Optional[str] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
-        graph_name: Optional[str] = None,
-        hop_depth: int = 1,
-        include_paths: bool = False,
         query_image: Optional[str] = None,
     ) -> GroupedChunkResponse
     ```
@@ -39,9 +36,6 @@ description: "Retrieve relevant chunks with grouping for UI display"
         end_user_id: Optional[str] = None,
         padding: int = 0,
         output_format: Optional[str] = None,
-        graph_name: Optional[str] = None,
-        hop_depth: int = 1,
-        include_paths: bool = False,
         query_image: Optional[str] = None,
     ) -> GroupedChunkResponse
     ```
@@ -64,9 +58,6 @@ description: "Retrieve relevant chunks with grouping for UI display"
   - `"base64"` (default): Returns base64-encoded image data
   - `"url"`: Returns presigned HTTPS URLs
   - `"text"`: Converts images to markdown text via OCR (faster inference, best for text-heavy documents)
-- `graph_name` (str, optional): Name of the graph to use for knowledge graph-enhanced retrieval
-- `hop_depth` (int, optional): Number of relationship hops to traverse in the graph. Defaults to 1.
-- `include_paths` (bool, optional): Whether to include relationship paths in the response. Defaults to False.
 - `query_image` (str, optional): Base64-encoded image for reverse image search. Mutually exclusive with `query`. Requires `use_colpali=True`.
 
 ## Returns
@@ -115,13 +106,6 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
         folder_depth=-1,
     )
 
-    # With knowledge graph enhancement
-    response = db.retrieve_chunks_grouped(
-        query="product features",
-        graph_name="product_graph",
-        hop_depth=2,
-        include_paths=True,
-    )
     ```
   </Tab>
   <Tab title="Async">
@@ -158,13 +142,6 @@ Filters follow the same JSON syntax across the API. See the [Metadata Filtering 
             folder_depth=-1,
         )
 
-        # With knowledge graph enhancement
-        response = await db.retrieve_chunks_grouped(
-            query="product features",
-            graph_name="product_graph",
-            hop_depth=2,
-            include_paths=True,
-        )
     ```
   </Tab>
 </Tabs>
@@ -192,7 +169,6 @@ Each `ChunkGroup` in `groups` has:
 - The `chunks` list provides backward compatibility with flat chunk lists.
 - The `groups` list organizes results with their padding context, ideal for building search result UIs.
 - When `padding` is specified, surrounding chunks are included in `padding_chunks` for each group.
-- Knowledge graph parameters (`graph_name`, `hop_depth`, `include_paths`) enable graph-enhanced retrieval.
 
 ## Reverse Image Search
 

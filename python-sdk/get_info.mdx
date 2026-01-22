@@ -1,0 +1,48 @@
+---
+title: "get_info"
+description: "Fetch the latest folder metadata from the API"
+---
+
+This method is available on `Folder` objects.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_info() -> FolderInfo
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_info() -> FolderInfo
+    ```
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `FolderInfo`: Folder metadata including `full_path`, `parent_id`, `depth`, and `child_count`
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("/projects/alpha")
+    info = folder.get_info()
+    print(info.full_path, info.child_count)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("/projects/alpha")
+        info = await folder.get_info()
+        print(info.full_path, info.child_count)
+    ```
+  </Tab>
+</Tabs>

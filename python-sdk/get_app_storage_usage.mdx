@@ -1,0 +1,28 @@
+---
+title: "get_app_storage_usage"
+description: "Return storage usage metrics for the authenticated app"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_app_storage_usage() -> AppStorageUsageResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_app_storage_usage() -> AppStorageUsageResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `AppStorageUsageResponse`: Storage usage details (chunk, raw, multivector, total, document count)
+
+## Examples
+
+```python
+usage = db.get_app_storage_usage()
+print(usage.total_mb, usage.document_count)
+```
