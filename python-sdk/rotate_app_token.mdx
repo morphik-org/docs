@@ -1,0 +1,41 @@
+---
+title: "rotate_app_token"
+description: "Rotate an app token by ID or name"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def rotate_app_token(
+        app_id: Optional[str] = None,
+        app_name: Optional[str] = None,
+        expiry_days: Optional[int] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def rotate_app_token(
+        app_id: Optional[str] = None,
+        app_name: Optional[str] = None,
+        expiry_days: Optional[int] = None,
+    ) -> Dict[str, Any]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `app_id` (str, optional): App ID to rotate
+- `app_name` (str, optional): App name to rotate
+- `expiry_days` (int, optional): New token expiry in days
+
+## Returns
+
+- `Dict[str, Any]`: API response containing the rotated token and metadata
+
+## Examples
+
+```python
+db.rotate_app_token(app_name="demo", expiry_days=30)
+```

@@ -1,0 +1,67 @@
+---
+title: "upsert_document_summary"
+description: "Create or update a document summary"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def upsert_document_summary(
+        document_id: str,
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def upsert_document_summary(
+        document_id: str,
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document
+- `content` (str): Summary content (markdown or plain text)
+- `versioning` (bool, optional): Create a new version instead of overwriting. Defaults to True.
+- `overwrite_latest` (bool, optional): Overwrite the latest summary when versioning is enabled. Defaults to False.
+
+## Returns
+
+- `Summary`: Updated summary payload
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    summary = db.upsert_document_summary(
+        document_id="doc_123",
+        content="This report summarizes Q2 performance.",
+    )
+    print(summary.version)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        summary = await db.upsert_document_summary(
+            document_id="doc_123",
+            content="This report summarizes Q2 performance.",
+        )
+        print(summary.version)
+    ```
+  </Tab>
+</Tabs>

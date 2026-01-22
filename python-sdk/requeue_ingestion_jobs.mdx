@@ -1,0 +1,57 @@
+---
+title: "requeue_ingestion_jobs"
+description: "Requeue ingestion jobs for failed or stuck documents"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def requeue_ingestion_jobs(
+        *,
+        jobs: Optional[List[Union[RequeueIngestionJob, Dict[str, Any]]]] = None,
+        include_all: bool = False,
+        statuses: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> RequeueIngestionResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def requeue_ingestion_jobs(
+        *,
+        jobs: Optional[List[Union[RequeueIngestionJob, Dict[str, Any]]]] = None,
+        include_all: bool = False,
+        statuses: Optional[List[str]] = None,
+        limit: Optional[int] = None,
+    ) -> RequeueIngestionResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `jobs` (List[RequeueIngestionJob | Dict[str, Any]], optional): Specific jobs to requeue
+- `include_all` (bool, optional): Requeue all matching jobs. Defaults to False.
+- `statuses` (List[str], optional): Limit to specific statuses (for example `["failed"]`)
+- `limit` (int, optional): Limit the number of jobs to requeue
+
+## Returns
+
+- `RequeueIngestionResponse`: Result details for each requeued job
+
+## Notes
+
+- You must provide either `jobs` or `include_all=True`.
+
+## Examples
+
+```python
+from morphik import Morphik
+from morphik.models import RequeueIngestionJob
+
+db = Morphik()
+resp = db.requeue_ingestion_jobs(
+    jobs=[RequeueIngestionJob(external_id="doc_123")],
+)
+print(resp.results)
+```

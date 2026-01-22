@@ -1,0 +1,63 @@
+---
+title: "wait_for_document_completion"
+description: "Block until a document finishes processing"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def wait_for_document_completion(
+        document_id: str,
+        timeout_seconds: int = 300,
+        check_interval_seconds: int = 2,
+        progress_callback: Optional[Callable[[int, int, str, float], None]] = None,
+    ) -> Document
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def wait_for_document_completion(
+        document_id: str,
+        timeout_seconds: int = 300,
+        check_interval_seconds: int = 2,
+        progress_callback: Optional[Callable[[int, int, str, float], None]] = None,
+    ) -> Document
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `document_id` (str): ID of the document to wait for
+- `timeout_seconds` (int, optional): Maximum time to wait for completion. Defaults to 300.
+- `check_interval_seconds` (int, optional): Delay between status checks. Defaults to 2.
+- `progress_callback` (callable, optional): Receives progress updates as `(current_step, total_steps, step_name, percentage)`
+
+## Returns
+
+- `Document`: Updated document metadata once processing completes
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    doc = db.ingest_text("Sample content")
+    ready = db.wait_for_document_completion(doc.external_id)
+    print(ready.status)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        doc = await db.ingest_text("Sample content")
+        ready = await db.wait_for_document_completion(doc.external_id)
+        print(ready.status)
+    ```
+  </Tab>
+</Tabs>

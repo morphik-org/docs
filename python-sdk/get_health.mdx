@@ -1,0 +1,30 @@
+---
+title: "get_health"
+description: "Return detailed health status for the API"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def get_health() -> DetailedHealthCheckResponse
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def get_health() -> DetailedHealthCheckResponse
+    ```
+  </Tab>
+</Tabs>
+
+## Returns
+
+- `DetailedHealthCheckResponse`: Overall health plus per-service status details
+
+## Examples
+
+```python
+health = db.get_health()
+print(health.status)
+for svc in health.services:
+    print(svc.name, svc.status)
+```

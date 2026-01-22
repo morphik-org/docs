@@ -71,7 +71,7 @@ Morphik supports organizing and isolating data by user and folder. This provides
   </Tab>
 </Tabs>
 
-Nested folders are supported across the SDK. Use canonical paths (e.g., `"/projects/alpha/specs"`) when creating or scoping folders, and pass `folder_depth` on retrieval/list/graph helpers to include descendant folders.
+Nested folders are supported across the SDK. Use canonical paths (e.g., `"/projects/alpha/specs"`) when creating or scoping folders, and pass `folder_depth` on retrieval/list helpers to include descendant folders.
 
 For detailed documentation and examples:
 - [Folder Management](/python-sdk/folders) - Organizing documents by logical groups
@@ -84,12 +84,24 @@ Both clients share the same constructor parameters:
 <Tabs>
   <Tab title="Sync">
     ```python
-    Morphik(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+    Morphik(
+        uri: Optional[str] = None,
+        timeout: int = 30,
+        is_local: bool = False,
+        http2: Optional[bool] = None,
+        http2_fallback: bool = True,
+    )
     ```
   </Tab>
   <Tab title="Async">
     ```python
-    AsyncMorphik(uri: Optional[str] = None, timeout: int = 30, is_local: bool = False)
+    AsyncMorphik(
+        uri: Optional[str] = None,
+        timeout: int = 30,
+        is_local: bool = False,
+        http2: Optional[bool] = None,
+        http2_fallback: bool = True,
+    )
     ```
   </Tab>
 </Tabs>
@@ -99,46 +111,82 @@ Both clients share the same constructor parameters:
 - `uri` (str, optional): Morphik URI in format "morphik://&lt;owner_id&gt;:&lt;token&gt;@&lt;host&gt;". If not provided, connects to http://localhost:8000 without authentication.
 - `timeout` (int, optional): Request timeout in seconds. Defaults to 30.
 - `is_local` (bool, optional): Whether connecting to local development server. Defaults to False.
+- `http2` (bool, optional): Enable HTTP/2 when possible. Defaults to None (auto-disabled for local).
+- `http2_fallback` (bool, optional): Fall back to HTTP/1.1 if HTTP/2 fails. Defaults to True.
 
 ## Methods
 
 Morphik provides the following methods. Each method page includes both synchronous and asynchronous versions.
 
-### Document Operations
+### Document Ingestion
 - [ingest_text](/python-sdk/ingest_text)
 - [ingest_file](/python-sdk/ingest_file)
 - [ingest_files](/python-sdk/ingest_files)
+- [ingest_directory](/python-sdk/ingest_directory)
 - [query_document](/python-sdk/query_document)
+
+### Document Retrieval
 - [retrieve_chunks](/python-sdk/retrieve_chunks)
+- [retrieve_chunks_grouped](/python-sdk/retrieve_chunks_grouped)
 - [retrieve_docs](/python-sdk/retrieve_docs)
 - [query](/python-sdk/query)
 - [list_documents](/python-sdk/list_documents)
+- [search_documents](/python-sdk/search_documents)
 - [get_document](/python-sdk/get_document)
 - [get_document_by_filename](/python-sdk/get_document_by_filename)
+
+### Document Updates & Summaries
 - [update_document_with_text](/python-sdk/update_document_with_text)
 - [update_document_with_file](/python-sdk/update_document_with_file)
 - [update_document_metadata](/python-sdk/update_document_metadata)
 - [update_document_by_filename_with_text](/python-sdk/update_document_by_filename_with_text)
 - [update_document_by_filename_with_file](/python-sdk/update_document_by_filename_with_file)
 - [update_document_by_filename_metadata](/python-sdk/update_document_by_filename_metadata)
+- [get_document_summary](/python-sdk/get_document_summary)
+- [upsert_document_summary](/python-sdk/upsert_document_summary)
+- [get_document_status](/python-sdk/get_document_status)
+- [wait_for_document_completion](/python-sdk/wait_for_document_completion)
+
+### Document Management
+- [get_document_file](/python-sdk/get_document_file)
+- [extract_document_pages](/python-sdk/extract_document_pages)
+- [get_document_download_url](/python-sdk/get_document_download_url)
 - [delete_document](/python-sdk/delete_document)
 - [delete_document_by_filename](/python-sdk/delete_document_by_filename)
 - [batch_get_documents](/python-sdk/batch_get_documents)
 - [batch_get_chunks](/python-sdk/batch_get_chunks)
 
-### Folder Operations
+### Folder & User Scoping
+- [folders](/python-sdk/folders)
 - [create_folder](/python-sdk/create_folder)
 - [list_folders](/python-sdk/list_folders)
 - [get_folder](/python-sdk/get_folder)
+- [get_folder_by_name](/python-sdk/get_folder_by_name)
+- [get_folder_summary](/python-sdk/get_folder_summary)
+- [upsert_folder_summary](/python-sdk/upsert_folder_summary)
+- [get_folders_summary](/python-sdk/get_folders_summary)
+- [get_folders_details](/python-sdk/get_folders_details)
 - [add_document_to_folder](/python-sdk/add_document_to_folder)
 - [remove_document_from_folder](/python-sdk/remove_document_from_folder)
 - [delete_folder](/python-sdk/delete_folder)
+- [users](/python-sdk/users)
 
-### Knowledge Graph Operations
-- [create_graph](/python-sdk/create_graph)
-- [get_graph](/python-sdk/get_graph)
-- [list_graphs](/python-sdk/list_graphs)
-- [update_graph](/python-sdk/update_graph)
+### Apps & Ops
+- [list_apps](/python-sdk/list_apps)
+- [create_app](/python-sdk/create_app)
+- [generate_cloud_uri](/python-sdk/generate_cloud_uri)
+- [rename_app](/python-sdk/rename_app)
+- [rotate_app_token](/python-sdk/rotate_app_token)
+- [delete_app](/python-sdk/delete_app)
+- [requeue_ingestion_jobs](/python-sdk/requeue_ingestion_jobs)
+- [get_logs](/python-sdk/get_logs)
+- [get_health](/python-sdk/get_health)
+- [get_app_storage_usage](/python-sdk/get_app_storage_usage)
+- [ping](/python-sdk/ping)
+
+### Chat & Conversation
+- [list_chat_conversations](/python-sdk/list_chat_conversations)
+- [get_chat_history](/python-sdk/get_chat_history)
 
 ### Client Management
 - [close](/python-sdk/close)

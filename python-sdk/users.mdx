@@ -96,9 +96,21 @@ The UserScope class provides the same document operations as the main Morphik cl
 - `list_documents` - List all documents owned by this user
 - `batch_get_documents` - Get multiple documents by their IDs for this user
 - `batch_get_chunks` - Get specific chunks by source for this user
-- `create_graph` - Create a knowledge graph from this user's documents
-- `update_graph` - Update a knowledge graph with new documents from this user
 - `delete_document_by_filename` - Delete a document by filename for this user
+
+## Scoping to Multiple Folders
+
+User scopes can include additional folder filters using `additional_folders` on retrieval/list/query helpers:
+
+```python
+user_scope = db.signin("user123")
+
+# Search within specific folders owned by this user
+results = user_scope.retrieve_chunks(
+    "contract terms",
+    additional_folders=["/legal/contracts", "/legal/archives"],
+)
+```
 
 ## Using Custom LLM Configuration with User Scopes
 

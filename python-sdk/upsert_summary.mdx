@@ -1,0 +1,62 @@
+---
+title: "upsert_summary"
+description: "Create or update a folder summary"
+---
+
+This method is available on `Folder` objects.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def upsert_summary(
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def upsert_summary(
+        content: str,
+        versioning: bool = True,
+        overwrite_latest: bool = False,
+    ) -> Summary
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `content` (str): Summary content (markdown or plain text)
+- `versioning` (bool, optional): Create a new version instead of overwriting. Defaults to True.
+- `overwrite_latest` (bool, optional): Overwrite the latest summary when versioning is enabled. Defaults to False.
+
+## Returns
+
+- `Summary`: Updated summary payload
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    folder = db.get_folder("/projects/alpha")
+    summary = folder.upsert_summary("Summary of project alpha.")
+    print(summary.version)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        folder = await db.get_folder("/projects/alpha")
+        summary = await folder.upsert_summary("Summary of project alpha.")
+        print(summary.version)
+    ```
+  </Tab>
+</Tabs>

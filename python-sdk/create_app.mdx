@@ -1,0 +1,57 @@
+---
+title: "create_app"
+description: "Create a cloud app and return its authenticated URI"
+---
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def create_app(
+        name: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def create_app(
+        name: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+</Tabs>
+
+## Parameters
+
+- `name` (str): App display name
+
+## Returns
+
+- `Dict[str, str]`: Response containing the authenticated URI and app metadata
+
+## Examples
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    from morphik import Morphik
+
+    db = Morphik()
+    resp = db.create_app(name="demo")
+    print(resp)
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    from morphik import AsyncMorphik
+
+    async with AsyncMorphik() as db:
+        resp = await db.create_app(name="demo")
+        print(resp)
+    ```
+  </Tab>
+</Tabs>
+
+## Notes
+
+- `generate_cloud_uri` is a deprecated alias for this method.
+- The SDK only accepts `name` for app creation.

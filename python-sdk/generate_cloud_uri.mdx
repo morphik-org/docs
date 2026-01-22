@@ -1,0 +1,25 @@
+---
+title: "generate_cloud_uri"
+description: "Deprecated alias for create_app"
+---
+
+`generate_cloud_uri` is a deprecated alias for [`create_app`](./create_app). Use `create_app` for all new integrations.
+
+See `create_app` for security notes about which fields are honored based on the token type.
+
+<Tabs>
+  <Tab title="Sync">
+    ```python
+    def generate_cloud_uri(
+        name: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+  <Tab title="Async">
+    ```python
+    async def generate_cloud_uri(
+        name: str,
+    ) -> Dict[str, str]
+    ```
+  </Tab>
+</Tabs>
